@@ -1,0 +1,90 @@
+body {
+  margin: 0;
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+}
+
+/*
+.container {
+  width: 100vw;
+  height: 100vh;
+  position: relative;
+  overflow: hidden;
+}
+*/
+.container {
+  width: 100vw;
+  height: 100vh;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  position: relative;
+  overflow: visible;
+  border: 1px solid black;
+}
+
+.content {
+  width: 0;
+  height: 0;
+  position: absolute;
+}
+
+.content .block {
+  pointer-events: none;
+  user-select: none;
+  position: absolute;
+}
+
+.panel {
+  position: absolute;
+  height: 100%;
+  width: 20%;
+  top: 0;
+  right: 0;
+  z-index: 3;
+  background-color: white;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  flex-direction: column;
+  padding: 20px;
+}
+
+.panel .buttons {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+}
+
+.inputContainer {
+  width: 100%;
+  margin-top: 10px;
+}
+
+.inputContainer .description {
+  margin-bottom: 10px;
+  color: #777;
+}
+
+.inputContainer .description .tab {
+  display: inline-block;
+  width: 24px;
+}
+
+.inputContainer textarea {
+  width: 100%;
+  height: 100px;
+  box-sizing: border-box;
+}
+
+.panel.--expressionMode .codeContainer {
+  display: none;
+}
+.panel.--codeMode .expressionContainer {
+  display: none;
+}
+
+.errorOutput {
+  color: red;
+}
