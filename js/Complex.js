@@ -10,7 +10,7 @@ export default class Complex {
     this.y = y;
   }
   static fromPolar = ({r, a}) => {
-    return new Complex(this.polarToCartesian({r, a}));
+    return this.polarToCartesian({r, a});
   }
 
   asCartesian() {
@@ -65,14 +65,14 @@ export default class Complex {
     });
   }
 
-  realPower(n) {
-    const polar = this.asPolar();
+  // realPower(n) {
+  //   const polar = this.asPolar();
 
-    return Complex.fromPolar({
-      r: Math.pow(polar.r, n),
-      a: polar.a*n
-    });
-  }
+  //   return Complex.fromPolar({
+  //     r: Math.pow(polar.r, n),
+  //     a: polar.a*n
+  //   });
+  // }
 
   static neg = ({x, y}) => {
     return new Complex({x: -x, y: -y});
