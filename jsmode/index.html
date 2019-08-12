@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+  <head>
+    <meta charset="utf-8">
+    <title>Fractalizer</title>
+    <script src="js/jquery-3.4.1.min.js"></script>
+    <script src="js/main.js" type="module"></script>
+    <link rel="stylesheet" href="style.css">
+  </head>
+  <body>
+    <div class="panel --expressionMode">
+      <div class="functionValue">f(0, 0) = (0, 0)</div>
+      <div class="buttons">
+        <button class="expressionButton">Expression</button>
+        <button class="codeButton">User code</button>
+      </div>
+      <div class="inputContainer expressionContainer">
+        <div class="description">
+          This is the expression mode. Type in any mathematical expression
+          containing +, -, *, /, ^ (power), or parentheses, and we will try to
+          evaluate it and convert it to JS code that can be run (or copied)<br>
+          You can also use functions sin, cos, neg (please use neg instead of
+          unary minus)
+        </div>
+        <textarea class="expression" placeholder="Write your mathematical expression here"></textarea>
+        <div class="buttons">
+          <button class="expressionRunButton">Run</button>
+          <button class="expressionCopyCodeButton">Copy JS code</button>
+        </div>
+      </div>
+      <div class="inputContainer codeContainer">
+        <div class="description">
+          This is the code mode. Type in a body of a JS function that gets
+          <a href="js/Complex.js">Complex</a>
+          object named 'c' as an argument and returns one aswell:<br>
+          <code><br>
+            function fun(c) {<br>
+              <div class="tab"></div>//Your code here<br>
+            }<br>
+          </code><br>
+          You can
+          use any JS, e.g. write your own functions.
+        </div>
+        <textarea class="code" placeholder="Write your custom JS code here"></textarea>
+        <div class="buttons">
+          <button class="codeRunButton">Run</button>
+        </div>
+      </div>
+      <div class="errorOutput"></div>
+    </div>
+    <div class="container">
+      <div class="content"></div>
+    </div>
+  </body>
+</html>

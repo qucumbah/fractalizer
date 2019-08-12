@@ -33,7 +33,7 @@ let contentStartY;
 let contentCurrentX = parseInt(content.css('left'));
 let contentCurrentY = parseInt(content.css('bottom'));
 function drag(event) {
-  updateFunctionValue(event);
+  //updateFunctionValue(event);
 
   if (isDragging) {
     contentCurrentX = contentStartX+event.clientX-dragStartX;
@@ -63,7 +63,7 @@ function changeScale(amount) {
   scale*=amount;
   rerender();
 }
-
+/*
 function updateFunctionValue(event) {
   let inputX = (-contentCurrentX+event.clientX)/scale;
   let inputY = (-contentCurrentY+(container.height()-event.clientY))/scale;
@@ -78,10 +78,10 @@ function updateFunctionValue(event) {
   resultY = resultY.toFixed(2);
 
   const output = `f(${inputX}, ${inputY}) = (${resultX}, ${resultY})`;
-
+  
   $('.functionValue').text(output);
 }
-
+*/
 function rerender() {
   clearRenderedBlocks();
   clearErrorOutput();
@@ -90,8 +90,8 @@ function rerender() {
 
 const screenWidth = container.width();
 const screenHeight = container.height();
-const imageWidth = 200;
-const imageHeight = 200;
+const imageWidth = 100;
+const imageHeight = 100;
 let renderedBlocks = [];
 function updateScreen() {
   const screenBottomLeft = {
@@ -133,12 +133,33 @@ function getSquare({ x, y }) {
 function isRendered(x, y) {
   return renderedBlocks.some(block => block.x===x && block.y===y);
 }
-
+let first = 1;
 //See sketch 1
 function renderBlock(x, y) {
   const block = { x, y }
   renderedBlocks.push(block);
-
+  
+  if (first) {
+    console.log(x, y);
+    first = 0;
+  }
+  
+  try {
+    const domImg = userFunction.renderer.getImage(x * imageWidth, y * imageHeight);
+    const img = $(domImg);
+    img.toggleClass('block');
+    
+    img.css({
+      left: x*imageWidth,
+      bottom: y*imageHeight,
+      width: imageWidth+'px',
+      height: imageHeight+1+'px' //Fix 1px gap between images
+    });
+    content.append(img);
+  } catch (e) {
+    outputError(e);
+  }
+  /*
   generateImage(x*imageWidth, y*imageHeight)
     .then(blob => {
       const img = $('<img>', {
@@ -157,61 +178,7 @@ function renderBlock(x, y) {
       block.object = blob;
     })
     .catch(outputError);
-}
-
-async function generateImage(offsetX, offsetY) {
-  //We need to store (r,g,b,a) data for each pixel of the image
-  //Each value needs 1 byte, so in the end we have width*height*4 bytes
-  const start = Date.now();
-  const data = new Uint8ClampedArray(imageWidth*imageHeight*4);
-
-  for (let y = 0; y<imageHeight; y++) {
-    for (let x = 0; x<imageWidth; x++) {
-      //We need to flip the image because image coordinates go down-right, but
-      //cartesian coordinates go up-right
-      let {r, g, b} = getRgbAt(offsetX + x, offsetY + (imageHeight - y));
-
-      r = Math.floor(r*255/100);
-      g = Math.floor(g*255/100);
-      b = Math.floor(b*255/100);
-
-      const dataOffset = 4*(y*imageWidth+x);
-
-      data[dataOffset+0] = r;
-      data[dataOffset+1] = g;
-      data[dataOffset+2] = b;
-      data[dataOffset+3] = 255; //alpha
-    }
-  }
-
-  const imageData = new ImageData(data, imageWidth, imageHeight);
-  const blob = await imageDataToBlob(imageData);
-
-  const end = Date.now();
-  //console.log(end-start);
-  return blob;
-}
-
-function getRgbAt(x, y) {
-  const c = new Complex({x, y}).mul({ x: 1/scale, y: 0 });
-
-  const polar = userFunction.evaluate(Complex, c).asPolar();
-  return hsvToRgb(
-    polar.a/Math.PI * 180,
-    // 0.71>sqrt(2)/2, max distance from origin<width*0.71
-    polar.r/(imageWidth*0.71/imageHeight)*100,
-    100
-  );
-}
-
-function imageDataToBlob(imageData) {
-  const canvas = document.createElement('canvas');
-  canvas.width = imageWidth;
-  canvas.height = imageHeight
-
-  canvas.getContext('2d').putImageData(imageData, 0, 0); //
-
-  return new Promise(resolve => canvas.toBlob(resolve));
+    */
 }
 
 updateScreen();

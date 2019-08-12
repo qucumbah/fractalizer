@@ -1,6 +1,7 @@
 import Complex from './Complex.js';
-import {getJSFromExpression} from './expressionParser.js';
+import {getGLSLFromExpression} from './expressionParser.js';
 import {outputError} from './util.js';
+import FractalRenderer from './FractalRenderer.js';
 
 const panel = $('.panel');
 const expression = $('.expression');
@@ -45,40 +46,47 @@ const userFunction = {
 $('.codeRunButton').click(function() {
   const currentFunctionBody = $('.code').get(0).value;
 
-  updateFunctionBody(currentFunctionBody);
+  updateRenderer(currentFunctionBody);
 });
 
 $('.expressionRunButton').click(function() {
   const currentExpression = $('.expression').get(0).value;
   try {
-    const currentFunctionBody = getJSFromExpression(currentExpression);
-    updateFunctionBody(currentFunctionBody);
+    const currentFunctionBody = getGLSLFromExpression(currentExpression);
+    updateRenderer(currentFunctionBody);
   } catch (error) {
     outputError(error);
   }
 });
 $('.expressionCopyCodeButton').click(function() {
   const currentExpression = $('.expression').get(0).value;
-  const currentFunctionBody = getJSFromExpression(currentExpression);
+  const currentFunctionBody = getGLSLFromExpression(currentExpression);
 
   navigator.clipboard.writeText(currentFunctionBody);
 });
 
-function updateFunctionBody(body) {
-  userFunction.evaluate = new Function('Complex', 'c', body);
-  console.log(userFunction.evaluate);
+function updateRenderer(body) {
+  //userFunction.evaluate = new Function('Complex', 'c', body);
+  //console.log(userFunction.evaluate);
+  
+  const globals = {
+    scale: 10,
+    saturationRange: 5,
+    valueRange: 0
+  };
+  userFunction.renderer = new FractalRenderer(body, 100, 100, globals);
+  
   userFunction._emit('change');
 }
 
 const DEFAULT_FUNCTION_BODY = `
-return c
-  .pow({x: 10, y: 0})
-  .sub(c)
-  .mul({x: 10, y: 0});
+vec2 fun(vec2 complex) {
+  return complex;
+}
 `;
 code.text(DEFAULT_FUNCTION_BODY);
 const DEFAULT_EXPRESSION_BODY = '(c^10 - c)*10';
 expression.text(DEFAULT_EXPRESSION_BODY);
-updateFunctionBody(DEFAULT_FUNCTION_BODY);
+updateRenderer(DEFAULT_FUNCTION_BODY);
 
 export default userFunction;

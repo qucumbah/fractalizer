@@ -1,4 +1,4 @@
-export function getJSFromExpression(expression) {
+export function getGLSLFromExpression(expression) {
   const reversePolish = parse(expression);
   console.log(reversePolish);
   let result = '';
@@ -21,13 +21,13 @@ export function getJSFromExpression(expression) {
           .reduce((prev, cur) => {
             return prev + ', ' + cur;
           });
-        result += `const ${tempResult} = Complex.${token}(${args});\n`;
+        result += `vec2 ${tempResult} = ${token}(${args});\n`;
       } else {
         //const temp{number of temp result} = arg1.{operatorName}(arg2);
         const arg1 = expression[0];
         const arg2 = expression[1];
         const operator = getProperOperatorName(expression[2]);
-        result += `const ${tempResult} = ${arg1}.${operator}(${arg2});\n`;
+        result += `vec2 ${tempResult} = ${operator}(${arg1}, (${arg2}));\n`;
       }
 
       reversePolish.splice(
@@ -49,7 +49,7 @@ export function getJSFromExpression(expression) {
       );
       throw new ExpressionParsingError(errorMessage);
     } else {
-      result += 'const temp0 = ' + reversePolish[0] + ';\n';
+      result += 'vec2 temp0 = ' + reversePolish[0] + ';\n';
     }
   }
 
@@ -121,7 +121,7 @@ function isVarOrConst(token) {
   return isConst(token) || isVar(token);
 }
 function isConst(token) {
-  return token.match(/\{x:[\w\W]+, y:[\w\W]+\}/);
+  return token.match(/vec2([\w\W]+, [\w\W]+\)/);
 }
 function isVar(token) {
   return token.length===1 && ALPHABET.includes(token);
@@ -228,11 +228,13 @@ function* getTokens(string) {
         );
 
         string = string.slice(complexNumberEndIndex + 1);
-        token = `new Complex({x: ${realPart}, y: ${imaginaryPart}})`;
+        //token = `new Complex({x: ${realPart}, y: ${imaginaryPart}})`;
+        token = `vec2(${realPart}, ${imaginaryPart})`;
       } else {
         //We parsed real number, now we have to conver it to imaginary one
         string = string.slice(token.length);
-        token = `new Complex({x: ${token}, y: 0})`;
+        //token = `new Complex({x: ${token}, y: 0})`;
+        token = `vec2(${token}, 0)`;
       }
     } else {
       //Token is one of the known constant tokens
