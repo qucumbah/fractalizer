@@ -1,6 +1,6 @@
 export function getGLSLFromExpression(expression) {
   const reversePolish = parse(expression);
-  console.log(reversePolish);
+  //console.log(reversePolish);
   let result = '';
 
   let numberOfTempResults = 0;
@@ -21,13 +21,14 @@ export function getGLSLFromExpression(expression) {
           .reduce((prev, cur) => {
             return prev + ', ' + cur;
           });
+        const fun = getProperFunctionName(token);
         result += `vec2 ${tempResult} = ${token}(${args});\n`;
       } else {
         //const temp{number of temp result} = arg1.{operatorName}(arg2);
         const arg1 = expression[0];
         const arg2 = expression[1];
         const operator = getProperOperatorName(expression[2]);
-        result += `vec2 ${tempResult} = ${operator}(${arg1}, (${arg2}));\n`;
+        result += `vec2 ${tempResult} = ${operator}(${arg1}, ${arg2});\n`;
       }
 
       reversePolish.splice(
@@ -44,16 +45,18 @@ export function getGLSLFromExpression(expression) {
   if (result === '') {
     if (reversePolish.length !== 1) {
       //No functions/operators, input is not only one token => error
-      const errorMessage = (
+      throw new ExpressionParsingError(
         'Incorrect number of outputs. Did you forget any operators or functions?'
       );
-      throw new ExpressionParsingError(errorMessage);
     } else {
       result += 'vec2 temp0 = ' + reversePolish[0] + ';\n';
     }
   }
 
   result += `return temp${numberOfTempResults};`;
+  
+  result = 'vec2 fun(vec2 c) {\n' + result + '\n}';
+  
   console.log(result);
 
   return result;
@@ -121,7 +124,7 @@ function isVarOrConst(token) {
   return isConst(token) || isVar(token);
 }
 function isConst(token) {
-  return token.match(/vec2([\w\W]+, [\w\W]+\)/);
+  return token.match(/vec2\([\w\W]+, [\w\W]+\)/);
 }
 function isVar(token) {
   return token.length===1 && ALPHABET.includes(token);
@@ -159,7 +162,7 @@ function getAssociativity(operator) {
 function getProperOperatorName(operator) {
   switch (operator) {
     case '^':
-      return 'pow';
+      return 'powComplex';
     case '*':
       return 'mul';
     case '/':
@@ -168,6 +171,18 @@ function getProperOperatorName(operator) {
       return 'add';
     case '-':
       return 'sub';
+  }
+}
+
+//Need this because Webgl's GLSL doesn't allow to redefine default functions
+function getProperFunctionName(fun) {
+  switch (fun) {
+    case 'sin':
+      return 'sinComplex';
+    case 'cos':
+      return 'cosComplex';
+    default:
+      return fun;
   }
 }
 
@@ -202,7 +217,14 @@ const AVAILABLE_TOKENS = [
 
 function* getTokens(string) {
   string = removeSpaceCharacters(string);
+  string = replaceUnaryMinus(string);
 
+  //We need to replace all unary minuses with neg() function
+  //To do that we check if token should be a value (not operator)
+  //Value is everything that is not an operator.
+  //If we expect a value but get an operator, then its
+  //either an unary minus (in case we get "-"), or an error (other cases)
+  let last;
   while (string) {
     let token = AVAILABLE_TOKENS.find(token => string.startsWith(token));
 
@@ -239,8 +261,41 @@ function* getTokens(string) {
     } else {
       //Token is one of the known constant tokens
       string = string.slice(token.length);
+      
+      //Check for unary minus
+      const expectValue = (
+        !last ||
+        isOperator(last) ||
+        isFunction(last) ||
+        last === ',' ||
+        last === '('
+      );
+
+      if (token === '-' && expectValue) {
+        console.log(last);
+        token = 'neg';
+      }
+      
+      /*
+      1 + sin -5
+      //Check for unary minus
+      if (expectValue) {
+        if (token==='-') {
+          token = 'neg';
+        } else if (isOperator(token)) {
+          throw new ExpressionParsingError(
+            'Syntax error: expected value, got an operator (' + token + ')'
+          );
+        } else {
+          expectValue = false;
+        }
+      } else if (isOperator(token) || token==='(' || token===')') {
+        expectValue = true;
+      }
+      */
     }
 
+    last = token;
     yield token;
   }
 
@@ -255,5 +310,11 @@ function removeSpaceCharacters(string) {
   let array = Array.from(string);
   array = array.filter(
       letter => (letter !== ' ') && (letter !== '\t') && (letter !== '\n'));
+  return array.join('');
+}
+
+function replaceUnaryMinus(string) {
+  let array = Array.from(string);
+  
   return array.join('');
 }

@@ -39,7 +39,7 @@ body {
 .panel {
   position: absolute;
   height: 100%;
-  width: 20%;
+  width: 250px;
   top: 0;
   right: 0;
   z-index: 3;
@@ -49,6 +49,23 @@ body {
   justify-content: flex-start;
   flex-direction: column;
   padding: 20px;
+  overflow-y: scroll;
+  box-sizing: border-box; 
+}
+
+.panel .options {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.panel .options .optionDescription {
+  text-align: left;
+  width: 100%;
+}
+
+.panel .options [type="checkbox"] {
+  display: inline-block;
 }
 
 .panel .buttons {

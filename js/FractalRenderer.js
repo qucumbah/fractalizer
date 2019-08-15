@@ -6,27 +6,40 @@ import {fragmentShaderSource} from './glsl/fragmentShaderSource.js';
 //draw(gl, program, 0, 0);
 
 export default class FractalRenderer {
-  constructor(funSource, width, height, globals) {
-    this.width = width;
-    this.height = height;
+  constructor({
+    body,
+    scale,
+    saturationRange,
+    valueRange,
+    _width,
+    _height
+  }) {
+    this.width = _width;
+    this.height = _height;
     
-    this.canvas = createCanvas(width, height);
+    this.canvas = createCanvas(_width, _height);
     this.gl = getGL(this.canvas);
     this.program = loadProgram(
         this.gl,
         vertexShaderSource,
-        fragmentShaderSource + funSource
+        fragmentShaderSource + body
     );
+    
+    const globals = { scale, saturationRange, valueRange };
     
     setGlobals(this.gl, this.program, globals);
   }
   
   getImage(x, y) {
     draw(this.gl, this.program, x, y, this.width, this.height);
+    
+    return new Promise(resolve => this.canvas.toBlob(resolve));
+    /*
     const result = new Image();
     result.src = this.canvas.toDataURL();
     
     return result;
+    */
   }
 }
 

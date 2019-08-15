@@ -1,18 +1,23 @@
-import Complex from './Complex.js';
 import userFunction from './userFunction.js';
+import auxOptions from './auxOptions.js';
 import {hsvToRgb, outputError, clearErrorOutput} from './util.js';
+
+userFunction.init();
 
 userFunction.on('change', rerender);
 
 const container = $('.container');
 const content = $('.content');
 //Center on start
-content.css('left', (container.width()-$('.panel').width())/2 + 'px');
-content.css('bottom', (container.height()/2) + 'px');
+//content.css('left', (container.width() - $('.panel').width()) / 2);
+content.css('left', container.width() / 2);
+content.css('bottom', container.height() / 2);
 
 container.on('mousedown', startDrag);
 container.on('mouseup', stopDrag);
 container.on('mousemove', drag);
+container.on('wheel', resetDragStart);
+/*
 container.on('wheel', function(event) {
   const SCROLL_MULTIPLIER = 0.5;
 
@@ -24,14 +29,22 @@ container.on('wheel', function(event) {
     changeScale(1 / SCROLL_MULTIPLIER);
   }
 });
-
+*/
+//Globals are evil, and I'm a friend of the devil
 let isDragging;
 let dragStartX;
 let dragStartY;
 let contentStartX;
 let contentStartY;
-let contentCurrentX = parseInt(content.css('left'));
-let contentCurrentY = parseInt(content.css('bottom'));
+let contentCurrentX;
+let contentCurrentY;
+
+function updateContentCurrentPosition() {
+  contentCurrentX = parseInt(content.css('left'));
+  contentCurrentY = parseInt(content.css('bottom'));
+}
+updateContentCurrentPosition();
+
 function drag(event) {
   //updateFunctionValue(event);
 
@@ -39,8 +52,8 @@ function drag(event) {
     contentCurrentX = contentStartX+event.clientX-dragStartX;
     contentCurrentY = contentStartY-event.clientY+dragStartY;
 
-    content.css('left', contentCurrentX + 'px');
-    content.css('bottom', contentCurrentY + 'px');
+    content.css('left', contentCurrentX);
+    content.css('bottom', contentCurrentY);
 
     updateScreen();
   }
@@ -48,22 +61,28 @@ function drag(event) {
 
 function startDrag(event) {
   isDragging = true;
-  dragStartX = event.clientX;
-  dragStartY = event.clientY;
-  contentStartX = parseInt(content.css('left'));
-  contentStartY = parseInt(content.css('bottom'));
+  resetDragStart(event);
 }
 function stopDrag() {
   isDragging = false;
 }
 
+//Need this to sync plane movement with drag after rescaling it
+function resetDragStart(event) {
+  dragStartX = event.clientX;
+  dragStartY = event.clientY;
+  contentStartX = parseInt(content.css('left'));
+  contentStartY = parseInt(content.css('bottom'));
+}
+
+/*
 let scale = 200;
 function changeScale(amount) {
   console.log(scale, 1/scale);
   scale*=amount;
   rerender();
 }
-/*
+
 function updateFunctionValue(event) {
   let inputX = (-contentCurrentX+event.clientX)/scale;
   let inputY = (-contentCurrentY+(container.height()-event.clientY))/scale;
@@ -83,6 +102,9 @@ function updateFunctionValue(event) {
 }
 */
 function rerender() {
+  content.css('transform', 'scale(1)');
+  
+  updateContentCurrentPosition();
   clearRenderedBlocks();
   clearErrorOutput();
   updateScreen();
@@ -94,6 +116,7 @@ const imageWidth = 100;
 const imageHeight = 100;
 let renderedBlocks = [];
 function updateScreen() {
+  /*
   const screenBottomLeft = {
     x: -contentCurrentX,
     y: -contentCurrentY
@@ -101,13 +124,33 @@ function updateScreen() {
   const screenTopRight = {
     x: -contentCurrentX + screenWidth,
     y: -contentCurrentY + screenHeight
+  };
+  
+  console.log(screenBottomLeft, screenTopRight);
+  */
+  
+  const scale = auxOptions.contentScaleFactor;
+  const distanceToCenter = {
+    x: ( screenWidth/2 - contentCurrentX ) / scale,
+    y: ( screenHeight/2 - contentCurrentY ) / scale
+  };
+  
+  const screenBottomLeft = {
+    x: distanceToCenter.x - screenWidth/2,
+    y: distanceToCenter.y - screenHeight/2
   }
-
+  const screenTopRight = {
+    x: distanceToCenter.x + screenWidth/2,
+    y: distanceToCenter.y + screenHeight/2
+  }
+  console.log(contentCurrentX, contentCurrentY, scale, distanceToCenter, screenBottomLeft, screenTopRight);
+  
   const bottomLeftSquare = getSquare(screenBottomLeft);
   const topRightSquare = getSquare(screenTopRight);
   for (let x = bottomLeftSquare.x; x<=topRightSquare.x; x++) {
     for (let y = bottomLeftSquare.y; y<=topRightSquare.y; y++) {
       if (!isRendered(x, y)) {
+        //renderBlock(x, y).catch(error => outputError(error));
         try {
           renderBlock(x, y);
         } catch (error) {
@@ -116,10 +159,21 @@ function updateScreen() {
       }
     }
   }
+  
 }
 
 function clearRenderedBlocks() {
-  renderedBlocks.forEach(block => URL.revokeObjectURL(block.object));
+  renderedBlocks.forEach(block => {
+    //If there is no object associated with this block then it got deleted
+    //before it could finish being rendered. This means that we'll have to
+    //delete it as soon as it renders, so we mark it 'dead'
+    if (!block.object) {
+      block.dead = true;
+    } else {
+      block.object.remove();
+      URL.revokeObjectURL(block.objectURL);
+    }
+  });
   renderedBlocks = [];
 }
 
@@ -133,52 +187,65 @@ function getSquare({ x, y }) {
 function isRendered(x, y) {
   return renderedBlocks.some(block => block.x===x && block.y===y);
 }
-let first = 1;
-//See sketch 1
+
 function renderBlock(x, y) {
   const block = { x, y }
   renderedBlocks.push(block);
   
-  if (first) {
-    console.log(x, y);
-    first = 0;
-  }
+  userFunction.renderer.getImage(x * imageWidth, y * imageHeight)
+    .then(blob => {
+      //Block has been marked 'dead' in clearRenderedBlocks(), which means that
+      //it got deleted while it was rendering. We can't stop render, so the
+      //best we can do is to not add it to the dom once its rendering finishes
+      if (block.dead) {
+        return;
+      }
+      const objectURL = URL.createObjectURL(blob);
+      
+      const img = $('<img>', {
+        src: objectURL,
+        class: 'block'
+      });
+
+      //Add small numbers to fix 1px gap between images
+      img.css({
+        left: x*imageWidth - 0.5,
+        bottom: y*imageHeight - 0.5,
+        width: imageWidth + 1,
+        height: imageHeight + 1
+      });
+      
+      content.append(img);
+      block.object = img;
+      block.objectURL = objectURL;
+    })
+    .catch(outputError);
+}
+
+//See sketch 1
+/*
+function renderBlock(x, y) {
+  const block = { x, y }
+  renderedBlocks.push(block);
   
   try {
     const domImg = userFunction.renderer.getImage(x * imageWidth, y * imageHeight);
     const img = $(domImg);
     img.toggleClass('block');
     
+    //Add small numbers to fix 1px gap between images
     img.css({
-      left: x*imageWidth,
-      bottom: y*imageHeight,
-      width: imageWidth+'px',
-      height: imageHeight+1+'px' //Fix 1px gap between images
+      left: x*imageWidth - 0.5,
+      bottom: y*imageHeight - 0.5,
+      width: imageWidth + 1,
+      height: imageHeight + 1
     });
     content.append(img);
+    block.object = img;
   } catch (e) {
     outputError(e);
   }
-  /*
-  generateImage(x*imageWidth, y*imageHeight)
-    .then(blob => {
-      const img = $('<img>', {
-        src: URL.createObjectURL(blob),
-        class: 'block'
-      });
-
-      img.css({
-        left: x*imageWidth,
-        bottom: y*imageHeight,
-        width: imageWidth+'px',
-        height: imageHeight+1+'px' //Fix 1px gap between images
-      });
-
-      content.append(img);
-      block.object = blob;
-    })
-    .catch(outputError);
-    */
 }
+*/
 
-updateScreen();
+rerender();

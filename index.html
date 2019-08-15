@@ -9,7 +9,19 @@
   </head>
   <body>
     <div class="panel --expressionMode">
-      <div class="functionValue">f(0, 0) = (0, 0)</div>
+      <div class="options">
+        <div>Options</div>
+        <div class="optionDescription">
+          Render as soon as the settings change:
+          <input id="fastModeCheckbox" type="checkbox"></input>
+        </div>
+        <div class="optionDescription">Scale</div>
+        <input id="scaleSlider" type="range" min="0" max="100"></input>
+        <div class="optionDescription">Saturation range</div>
+        <input id="saturationRangeSlider" type="range" min="0" max="100"></input>
+        <div class="optionDescription">Value range</div>
+        <input id="valueRangeSlider" type="range" min="0" max="100"></input>
+      </div>
       <div class="buttons">
         <button class="expressionButton">Expression</button>
         <button class="codeButton">User code</button>
@@ -24,7 +36,7 @@
         </div>
         <textarea class="expression" placeholder="Write your mathematical expression here"></textarea>
         <div class="buttons">
-          <button class="expressionRunButton">Run</button>
+          <button class="runButton expressionRunButton">Run</button>
           <button class="expressionCopyCodeButton">Copy JS code</button>
         </div>
       </div>
@@ -43,7 +55,7 @@
         </div>
         <textarea class="code" placeholder="Write your custom JS code here"></textarea>
         <div class="buttons">
-          <button class="codeRunButton">Run</button>
+          <button class="runButton codeRunButton">Run</button>
         </div>
       </div>
       <div class="errorOutput"></div>

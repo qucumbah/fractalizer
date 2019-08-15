@@ -1,31 +1,31 @@
 export const fragmentShaderSource = `
-precision mediump float;
+precision highp float;
 
 ///////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////Complex////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////
 
 float PI = 3.141592653589793;
-
-vec2 cartesian(float x, float y) {
-  return vec2(x, y);
-}
-vec2 polar(float r, float a) {
-  return vec2(r, a);
-}
+float E  = 2.718281828459045;
 
 vec2 cartesianToPolar(vec2 v) {
-  float r = sqrt(v.x*v.x + v.y*v.y);
-  if (r == 0.0) {
+  float s = v.x*v.x + v.y*v.y;
+  
+  if (s <= 0.0) {
     return vec2(0, 0);
   }
+  
+  float r = sqrt(s);
   float a = v.y>=0.0 ? acos(v.x/r) : PI*2.0-acos(v.x/r);
+  
+  //a = clamp(a, 0.0, PI*2.0);
+  
   return vec2(r, a);
 }
-vec2 polarToCartesian(vec2 v) {
+vec2 polarToCartesian(float r, float a) {
   return vec2(
-    v[0]*cos(v[1]),
-    v[0]*sin(v[1])
+    r*cos(a),
+    r*sin(a)
   );
 }
 
@@ -40,19 +40,49 @@ vec2 mul(vec2 a, vec2 b) {
   vec2 aPolar = cartesianToPolar(a);
   vec2 bPolar = cartesianToPolar(b);
   
-  return polarToCartesian(vec2(
+  return polarToCartesian(
     aPolar[0] * bPolar[0],
     aPolar[1] + bPolar[1]
-  ));
+  );
 }
 vec2 div(vec2 a, vec2 b) {
   vec2 aPolar = cartesianToPolar(a);
   vec2 bPolar = cartesianToPolar(b);
   
-  return polarToCartesian(vec2(
+  return polarToCartesian(
     aPolar[0] / bPolar[0],
     aPolar[1] - bPolar[1]
-  ));
+  );
+}
+
+vec2 powComplex(vec2 v1, vec2 v2) {
+  if (v1.x == 0.0 && v1.y == 0.0) {
+    return vec2(0, 0);
+  }
+  
+  vec2 polar = cartesianToPolar(v1);
+  float a = polar[1];
+  float r = polar[0];
+  float c = v2.x;
+  float d = v2.y;
+  
+  float resultRadius = pow(r, c) * pow(E, -d*a);
+  float resultAngle = d*log(r) + c*a;
+  
+  return polarToCartesian(resultRadius, resultAngle);
+}
+
+vec2 neg(vec2 a) {
+  return vec2(-a.x, -a.y);
+}
+
+vec2 sinComplex(vec2 a) {
+  vec2 left = polarToCartesian( pow(E, -a.y)/2.0, a.x - PI/2.0 );
+  vec2 right = polarToCartesian( pow(E, a.y)/2.0, -a.x - PI/2.0 );
+  return sub(left, right);
+}
+vec2 cosComplex(vec2 a) {
+  return sinComplex( vec2(PI/2.0 - a.x, a.y) );
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -148,14 +178,6 @@ vec3 hsvToRgb(float h, float s, float v) {
 
 vec2 fun(vec2 complex);
 
-float clamp1(float a) {
-  if (a > 1.0) {
-    return 1.0;
-  }
-  
-  return a;
-}
-
 varying vec2 v_position;
 
 uniform vec2 u_offset;
@@ -163,23 +185,26 @@ uniform vec2 u_imageSize;
 uniform float u_scale;
 uniform float u_saturationRange;
 uniform float u_valueRange;
-
 void main() {
   float halfImageWidth = u_imageSize.x / 2.0;
   float halfImageHeight = u_imageSize.y / 2.0;
   
   vec2 bottomLeft = vec2(
-      v_position.x*halfImageWidth + halfImageWidth + u_offset.x,
-      v_position.y*halfImageHeight + halfImageHeight + u_offset.y
+    v_position.x*halfImageWidth + halfImageWidth + u_offset.x,
+    v_position.y*halfImageHeight + halfImageHeight + u_offset.y
   );
   vec2 complex = mul( bottomLeft, vec2(1.0/u_scale, 0) );
   vec2 polar = cartesianToPolar( fun(complex) );
   
+  float saturation = u_saturationRange==0.0 ? 100.0 : clamp(polar[0] / u_saturationRange, 0.0, 1.0) * 100.0;
+  float value = u_valueRange==0.0 ? 100.0 : clamp(polar[0] / u_valueRange, 0.0, 1.0) * 100.0;
+  
   vec3 rgb = hsvToRgb(
     polar[1] / PI * 180.0,
-    clamp1(polar[0] / u_saturationRange) * 100.0,
-    clamp1(polar[0] / u_valueRange) * 100.0
+    saturation,
+    value
   );
+  
   gl_FragColor = vec4(rgb, 1);
 }
 `;
