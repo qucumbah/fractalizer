@@ -1,0 +1,23 @@
+TODOS:
+1) New interface
+	1. Quick reload button
+	2. Theming
+	3. Closeable panel
+	4. Settings
+2) Touch support
+3) Service worker P
+4) Library of fractals
+5) History api
+6) Additional info
+7) Save settings
+8) Scale to Slider piping V
+9) Change scale units V
+10) Web app manifest V
+11) Add back function value
+12) Give user ability to set X and Y manually
+13) Message system
+14) Loader
+
+Fractalibrary
+c^{-1;-1} - whirlwind
+c^{0;-1} - infinite circle

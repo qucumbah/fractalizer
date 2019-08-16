@@ -22,11 +22,11 @@ class AuxOptions extends EventEmitter {
     this.fastMode = (fastMode!==undefined)?fastMode:this.fastMode;
     this.scale = scale?scale:this.scale;
     this.contentScaleFactor =
-        contentScaleFactor?contentScaleFactor:this.contentScaleFactor;
+        (contentScaleFactor!==undefined)?contentScaleFactor:this.contentScaleFactor;
     this.saturationRange =
-        saturationRange?saturationRange:this.saturationRange;
+        (saturationRange!==undefined)?saturationRange:this.saturationRange;
     this.valueRange =
-        valueRange?valueRange:this.valueRange;
+        (valueRange!==undefined)?valueRange:this.valueRange;
     
     this._emit('change', this);
   }
@@ -94,9 +94,6 @@ function setFakeScale(amount, mouseOffset) {
     auxOptions.update({ contentScaleFactor: newScaleFactor });
   }
   
-  /*
-  const transforms = [];
-  */
   //Center of scaling should stay in place
   const centerOfScalingOffset = mouseOffset?mouseOffset:{
     bottom: container.height() / 2,
@@ -144,7 +141,7 @@ scaleSlider.on('change', event => {
   setActualScale();
 });
 $('.container').on('wheel', event => {
-  const DEFAULT_AMOUNT = 10;
+  const DEFAULT_AMOUNT = 1.1;
   
   const amount = event.originalEvent.deltaY;
   
@@ -154,11 +151,13 @@ $('.container').on('wheel', event => {
   }
   
   if (amount>0) {
-    setFakeScale(fakeScale - DEFAULT_AMOUNT, mouseOffset);
+    setFakeScale(fakeScale / DEFAULT_AMOUNT, mouseOffset);
   } else {
-    setFakeScale(fakeScale + DEFAULT_AMOUNT, mouseOffset);
+    setFakeScale(fakeScale * DEFAULT_AMOUNT, mouseOffset);
   }
-  setActualScale();
+  
+  scaleSlider.val(fakeScale);
+  //setActualScale();
 });
 
 saturationRangeSlider.on('change', function() {

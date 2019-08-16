@@ -16,7 +16,6 @@ vec2 fun(vec2 c) {
 class UserFunction extends EventEmitter {
   constructor() {
     super();
-    this.renderer = null;
     this.options = {
       body: DEFAULT_FUNCTION_BODY,
       scale: auxOptions.scale,
@@ -26,6 +25,7 @@ class UserFunction extends EventEmitter {
       _width: 100,
       _height: 100
     }
+    this.renderer = new FractalRenderer(this.options);
     
     this._update();
   }
@@ -39,12 +39,12 @@ class UserFunction extends EventEmitter {
   }) {
     this.options.body = body?body:this.options.body;
     this.options.fastMode =
-      fastMode!==undefined?fastMode:this.options.fastMode;
-    this.options.scale = scale?scale:this.options.scale;
+      (fastMode!==undefined)?fastMode:this.options.fastMode;
+    this.options.scale = (scale!==undefined)?scale:this.options.scale;
     this.options.saturationRange =
-        saturationRange?saturationRange:this.options.saturationRange;
+        (saturationRange!==undefined)?saturationRange:this.options.saturationRange;
     this.options.valueRange =
-        valueRange?valueRange:this.options.valueRange;
+        (valueRange!==undefined)?valueRange:this.options.valueRange;
     
     if (this.options.fastMode || body) {
       this._update();
@@ -52,7 +52,7 @@ class UserFunction extends EventEmitter {
   }
   
   _update() {
-    this.renderer = new FractalRenderer(this.options);
+    this.renderer.updateProgram(this.options);
     
     this._emit('change');
   }

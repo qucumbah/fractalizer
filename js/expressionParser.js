@@ -312,9 +312,3 @@ function removeSpaceCharacters(string) {
       letter => (letter !== ' ') && (letter !== '\t') && (letter !== '\n'));
   return array.join('');
 }
-
-function replaceUnaryMinus(string) {
-  let array = Array.from(string);
-  
-  return array.join('');
-}

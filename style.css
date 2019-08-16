@@ -84,11 +84,6 @@ body {
   border-width: 0px;
   width: 40px;
 }
-.sliderContainer .textInput:focus,
-.sliderContainer .textInput:active,
-.sliderContainer .textInput:select {
-  border-width: 2px;
-}
 
 .sliderContainer .slider {
   width: auto;

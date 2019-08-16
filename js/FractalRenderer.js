@@ -19,10 +19,13 @@ export default class FractalRenderer {
     
     this.canvas = createCanvas(_width, _height);
     this.gl = getGL(this.canvas);
+  }
+  
+  updateProgram({ body, scale, saturationRange, valueRange }) {
     this.program = loadProgram(
-        this.gl,
-        vertexShaderSource,
-        fragmentShaderSource + body
+      this.gl,
+      vertexShaderSource,
+      fragmentShaderSource + body
     );
     
     const globals = { scale, saturationRange, valueRange };
