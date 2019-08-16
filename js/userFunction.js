@@ -1,6 +1,7 @@
 import {getGLSLFromExpression} from './expressionParser.js';
 import {outputError} from './util.js';
 import FractalRenderer from './FractalRenderer.js';
+import EventEmitter from './EventEmitter.js';
 import auxOptions from './auxOptions.js';
 
 const DEFAULT_FUNCTION_BODY = `
@@ -12,6 +13,53 @@ vec2 fun(vec2 c) {
 }
 `;
 
+class UserFunction extends EventEmitter {
+  constructor() {
+    super();
+    this.renderer = null;
+    this.options = {
+      body: DEFAULT_FUNCTION_BODY,
+      scale: auxOptions.scale,
+      saturationRange: auxOptions.saturationRange,
+      valueRange: auxOptions.valueRange,
+      
+      _width: 100,
+      _height: 100
+    }
+    
+    this._update();
+  }
+  
+  changeOptions({
+      body,
+      fastMode,
+      scale,
+      saturationRange,
+      valueRange
+  }) {
+    this.options.body = body?body:this.options.body;
+    this.options.fastMode =
+      fastMode!==undefined?fastMode:this.options.fastMode;
+    this.options.scale = scale?scale:this.options.scale;
+    this.options.saturationRange =
+        saturationRange?saturationRange:this.options.saturationRange;
+    this.options.valueRange =
+        valueRange?valueRange:this.options.valueRange;
+    
+    if (this.options.fastMode || body) {
+      this._update();
+    }
+  }
+  
+  _update() {
+    this.renderer = new FractalRenderer(this.options);
+    
+    this._emit('change');
+  }
+}
+
+const userFunction = new UserFunction();
+/*
 const userFunction = {
   renderer: null,
   _listeners: {},
@@ -72,7 +120,7 @@ const userFunction = {
     }
   }
 };
-
+*/
 auxOptions.on('change', options => userFunction.changeOptions(options));
 
 const panel = $('.panel');

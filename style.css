@@ -53,19 +53,45 @@ body {
   box-sizing: border-box; 
 }
 
-.panel .options {
+.options {
   display: flex;
   flex-direction: column;
   align-items: center;
 }
 
-.panel .options .optionDescription {
-  text-align: left;
-  width: 100%;
+.checkboxContainer {
+  margin: 10px 0 20px;
 }
 
-.panel .options [type="checkbox"] {
+.checkboxContainer .fastModeCheckbox {
   display: inline-block;
+}
+
+.sliderContainer {
+  display: grid;
+  grid-template-rows: auto auto;
+  grid-template-columns: 40px 1fr 40px;
+  margin-bottom: 20px;
+}
+
+.sliderContainer .description {
+  grid-column: span 3;
+}
+
+.sliderContainer .textInput {
+  display: inline-flex;
+  text-align: center;
+  border-width: 0px;
+  width: 40px;
+}
+.sliderContainer .textInput:focus,
+.sliderContainer .textInput:active,
+.sliderContainer .textInput:select {
+  border-width: 2px;
+}
+
+.sliderContainer .slider {
+  width: auto;
 }
 
 .panel .buttons {

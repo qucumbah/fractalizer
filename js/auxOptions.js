@@ -1,11 +1,15 @@
-const auxOptions = {
-  _listeners: {},
-  
-  fastMode: false,
-  scale: 200,
-  contentScaleFactor: 1,
-  saturationRange: 5,
-  valueRange: 0,
+import EventEmitter from './EventEmitter.js';
+import Slider from './Slider.js';
+
+class AuxOptions extends EventEmitter {
+  constructor() {
+    super();
+    this.fastMode = false;
+    this.scale = 200;
+    this.contentScaleFactor = 1;
+    this.saturationRange = 5;
+    this.valueRange = 0;
+  }
   
   update({
     fastMode,
@@ -25,32 +29,45 @@ const auxOptions = {
         valueRange?valueRange:this.valueRange;
     
     this._emit('change', this);
-  },
-  
-  on(event, callback) {
-    if (!this._listeners[event]) {
-      this._listeners[event] = [callback];
-    } else {
-      this._listeners[event].push(callback);
-    }
-  },
-
-  _emit(event, data) {
-    if (!this._listeners[event]) {
-      return;
-    } else {
-      this._listeners[event].forEach(callback => callback.call(null, data));
-    }
   }
 }
+
+const auxOptions = new AuxOptions();
 
 const content = $('.content');
 const container = $('.container');
 const runButtons = $('.runButton');
-const fastModeCheckbox = $('#fastModeCheckbox');
+const fastModeCheckbox = $('.fastModeCheckbox');
+/*
 const scaleSlider = $('#scaleSlider');
 const saturationRangeSlider = $('#saturationRangeSlider');
 const valueRangeSlider = $('#valueRangeSlider');
+
+const scaleSlider = new Slider('scaleSlider', auxOptions.scale, 100, 300);
+const saturationRangeSlider = new Slider('saturationRangeSlider');
+const valueRangeSlider = new Slider('valueRangeSlider');
+*/
+const scaleSlider = new Slider({
+  className: 'scaleSlider',
+  value: auxOptions.scale,
+  min: auxOptions.scale - 100,
+  max: auxOptions.scale + 100,
+  lowerBound: 1,
+});
+const saturationRangeSlider = new Slider({
+  className: 'saturationRangeSlider',
+  value: auxOptions.saturationRange,
+  min: 0,
+  max: 100,
+  lowerBound: 0,
+});
+const valueRangeSlider = new Slider({
+  className: 'valueRangeSlider',
+  value: auxOptions.valueRange,
+  min: 0,
+  max: 100,
+  lowerBound: 0,
+});
 
 fastModeCheckbox.on('change', function(event) {
   const fastMode = fastModeCheckbox.is(':checked');
@@ -113,10 +130,6 @@ function setActualScale() {
   }
 }
 
-function getContentOffset() {
-  
-}
-
 runButtons.on('click', event => {
   initialScale = 0;
   if (!auxOptions.fastMode) {
@@ -125,11 +138,9 @@ runButtons.on('click', event => {
 });
 
 scaleSlider.on('input', event => {
-  const change = (event.target.value - 50) * 5;
-  setFakeScale(auxOptions.scale + change);
+  setFakeScale( scaleSlider.val() );
 });
 scaleSlider.on('change', event => {
-  scaleSlider.val(50);
   setActualScale();
 });
 $('.container').on('wheel', event => {
@@ -153,11 +164,8 @@ $('.container').on('wheel', event => {
 saturationRangeSlider.on('change', function() {
   auxOptions.update({ saturationRange: saturationRangeSlider.val() });
 });
-saturationRangeSlider.val(auxOptions.saturationRange);
-
 valueRangeSlider.on('change', function() {
   auxOptions.update({ valueRange: valueRangeSlider.val() });
 });
-valueRangeSlider.val(auxOptions.valueRange);
 
 export default auxOptions;

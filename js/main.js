@@ -2,8 +2,6 @@ import userFunction from './userFunction.js';
 import auxOptions from './auxOptions.js';
 import {hsvToRgb, outputError, clearErrorOutput} from './util.js';
 
-userFunction.init();
-
 userFunction.on('change', rerender);
 
 const container = $('.container');
@@ -143,7 +141,7 @@ function updateScreen() {
     x: distanceToCenter.x + screenWidth/2,
     y: distanceToCenter.y + screenHeight/2
   }
-  console.log(contentCurrentX, contentCurrentY, scale, distanceToCenter, screenBottomLeft, screenTopRight);
+  //console.log(contentCurrentX, contentCurrentY, scale, distanceToCenter, screenBottomLeft, screenTopRight);
   
   const bottomLeftSquare = getSquare(screenBottomLeft);
   const topRightSquare = getSquare(screenTopRight);

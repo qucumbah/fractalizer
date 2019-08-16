@@ -11,16 +11,48 @@
     <div class="panel --expressionMode">
       <div class="options">
         <div>Options</div>
-        <div class="optionDescription">
+        <div class="checkboxContainer">
           Render as soon as the settings change:
-          <input id="fastModeCheckbox" type="checkbox"></input>
+          <input class="fastModeCheckbox" type="checkbox"></input>
         </div>
-        <div class="optionDescription">Scale</div>
+        
+        <div class="sliderContainer scaleSlider">
+          <div class="description">
+            Scale=
+            <input class="textInput value"></input>
+          </div>
+          <input class="textInput min"></input>
+          <input class="slider" type="range" min="0" max="100"></input>
+          <input class="textInput max"></input>
+        </div>
+        
+        <div class="sliderContainer saturationRangeSlider">
+          <div class="description">
+            Saturation range=
+            <input class="textInput value"></input>
+          </div>
+          <input class="textInput min"></input>
+          <input class="slider" type="range" min="0" max="100"></input>
+          <input class="textInput max"></input>
+        </div>
+        
+        <div class="sliderContainer valueRangeSlider">
+          <div class="description">
+            Value range=
+            <input class="textInput value"></input>
+          </div>
+          <input class="textInput min"></input>
+          <input class="slider" type="range" min="0" max="100"></input>
+          <input class="textInput max"></input>
+        </div>
+        <!--
+        <div class="description">Scale</div>
         <input id="scaleSlider" type="range" min="0" max="100"></input>
-        <div class="optionDescription">Saturation range</div>
+        <div class="description">Saturation range</div>
         <input id="saturationRangeSlider" type="range" min="0" max="100"></input>
-        <div class="optionDescription">Value range</div>
+        <div class="description">Value range</div>
         <input id="valueRangeSlider" type="range" min="0" max="100"></input>
+        -->
       </div>
       <div class="buttons">
         <button class="expressionButton">Expression</button>
@@ -29,10 +61,10 @@
       <div class="inputContainer expressionContainer">
         <div class="description">
           This is the expression mode. Type in any mathematical expression
-          containing +, -, *, /, ^ (power), or parentheses, and we will try to
-          evaluate it and convert it to JS code that can be run (or copied)<br>
-          You can also use functions sin, cos, neg (please use neg instead of
-          unary minus)
+          containing +, -, *, /, ^ (power), parentheses, or constants, such as
+          10, 0.25, {12;-1} (complex constant). We will try to show you the
+          results in color.<br>
+          You can also use functions sin and cos
         </div>
         <textarea class="expression" placeholder="Write your mathematical expression here"></textarea>
         <div class="buttons">
@@ -42,16 +74,21 @@
       </div>
       <div class="inputContainer codeContainer">
         <div class="description">
-          This is the code mode. Type in a body of a JS function that gets
-          <a href="/complexSpec.html">Complex</a>
-          object named 'c' as an argument and returns one aswell:<br>
+          This is the code mode. Type in any GLSL code that includes function
+          named 'fun' that takes vec2 as an argument and returns one aswell:
           <code><br>
-            function fun(c) {<br>
-              <div class="tab"></div>//Your code here<br>
+            //Any code before<br>
+            <br>
+            vec2 fun(vec2 c) {<br>
+              <div class="tab"></div>//Any code inside<br>
+              <div class="tab"></div>return result;<br>
             }<br>
+            <br>
+            //Any code after
           </code><br>
-          You can
-          use any JS, e.g. write your own functions.
+          You can use any GLSL, e.g. write your own functions. Your code will
+          be appended after
+          <a href="/js/glsl/fragmentShaderSource.js" target="_blank">fragment shader</a>.
         </div>
         <textarea class="code" placeholder="Write your custom JS code here"></textarea>
         <div class="buttons">
