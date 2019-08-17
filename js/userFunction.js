@@ -3,13 +3,19 @@ import {outputError} from './util.js';
 import FractalRenderer from './FractalRenderer.js';
 import EventEmitter from './EventEmitter.js';
 import auxOptions from './auxOptions.js';
-
+/*
 const DEFAULT_FUNCTION_BODY = `
 vec2 fun(vec2 c) {
   vec2 temp1 = powComplex(c, vec2(10, 0));
   vec2 temp2 = sub(temp1, c);
   vec2 temp3 = mul(temp2, vec2(10, 0));
   return temp3;
+}
+`;
+*/
+const DEFAULT_FUNCTION_BODY = `
+vec2 fun(vec2 c) {
+  return c;
 }
 `;
 
@@ -53,6 +59,12 @@ class UserFunction extends EventEmitter {
   
   _update() {
     this.renderer.updateProgram(this.options);
+    
+    this.renderer.getValueAt(200, 0)
+      .then(async result => {
+        const buff = await result.arrayBuffer();
+        console.log(buff);
+      });
     
     this._emit('change');
   }

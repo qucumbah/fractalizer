@@ -1,9 +1,5 @@
-import {vertexShaderSource} from './glsl/vertexShaderSource.js';
-import {fragmentShaderSource} from './glsl/fragmentShaderSource.js';
-
-//const gl = init();
-//const program = loadProgram(gl, vertexShaderSource, fragmentShaderSource);
-//draw(gl, program, 0, 0);
+import vertexShaderSource from './glsl/vertexShaderSource.js';
+import fragmentShaderSource from './glsl/fragmentShaderSource.js';
 
 export default class FractalRenderer {
   constructor({
@@ -29,20 +25,23 @@ export default class FractalRenderer {
     );
     
     const globals = { scale, saturationRange, valueRange };
-    
     setGlobals(this.gl, this.program, globals);
+  }
+  
+  getValueAt(x, y) {
+    getValueAt(this.gl, this.program, x, y);
+    
+    const arr = new Uint8Array(16);
+    this.gl.readPixels(0, 0, 2, 2, this.gl.RGBA, this.gl.UNSIGNED_BYTE, arr);
+    console.log(arr);
+    
+    return new Promise(resolve => this.canvas.toBlob(resolve));
   }
   
   getImage(x, y) {
     draw(this.gl, this.program, x, y, this.width, this.height);
     
     return new Promise(resolve => this.canvas.toBlob(resolve));
-    /*
-    const result = new Image();
-    result.src = this.canvas.toDataURL();
-    
-    return result;
-    */
   }
 }
 
@@ -63,7 +62,7 @@ function getGL(canvas) {
     throw new Error('Error: webgl not supported');
   }
   
-  console.dir(gl);
+  //console.dir(gl);
   
   return gl;
 }
@@ -83,13 +82,12 @@ function loadProgram(gl, vertexShaderSource, fragmentShaderSource) {
     -1, -1,
     1, 1,
     1, -1,
+    -1, 1,
     -1, -1,
     1, 1,
-    -1, 1,
   ];
   gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(positions), gl.STATIC_DRAW);
   
-  gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
   gl.enableVertexAttribArray(a_positionLocation);
   
   const size = 2;
@@ -108,31 +106,38 @@ function setGlobals(gl, program, globals) {
     const location = gl.getUniformLocation(program, 'u_' + name);
     gl.uniform1f(location, globals[name]);
   }
-  /*
-  //Set globals to user settings
-  const scale = 10;
-  const saturationRange = 5;
-  const valueRange = 0;
-  
-  const u_scaleLocation = gl.getUniformLocation(program, 'u_scale');
-  const u_saturationRangeLocation = gl.getUniformLocation(program, 'u_saturationRange');
-  const u_valueRangeLocation = gl.getUniformLocation(program, 'u_valueRange');
-  gl.uniform1f(u_scaleLocation, scale);
-  gl.uniform1f(u_saturationRangeLocation, saturationRange);
-  gl.uniform1f(u_valueRangeLocation, valueRange);
-  */
 }
 
 function draw(gl, program, x, y, width, height) {
+  gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
+  
   const u_offsetLocation = gl.getUniformLocation(program, 'u_offset');
   const u_imageSizeLocation = gl.getUniformLocation(program, 'u_imageSize');
+  const u_returnTypeLocation = gl.getUniformLocation(program, 'u_returnType');
   
   gl.uniform2f(u_offsetLocation, x, y);
   gl.uniform2f(u_imageSizeLocation, width, height);
+  gl.uniform1i(u_returnTypeLocation, 0);
   
   const primitiveType = gl.TRIANGLES;
   const offset = 0;
   const count = 6;
+  gl.drawArrays(primitiveType, offset, count);
+}
+
+function getValueAt(gl, program, x, y) {
+  gl.viewport(0, 0, 2, 2);
+  
+  const u_offsetLocation = gl.getUniformLocation(program, 'u_offset');
+  const u_returnTypeLocation = gl.getUniformLocation(program, 'u_returnType');
+  
+  gl.uniform2f(u_offsetLocation, x, y);
+  gl.uniform1i(u_returnTypeLocation, 1);
+  
+  const primitiveType = gl.POINTS;
+  const offset = 0;
+  const count = 4;
+  
   gl.drawArrays(primitiveType, offset, count);
 }
 

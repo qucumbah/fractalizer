@@ -217,7 +217,6 @@ const AVAILABLE_TOKENS = [
 
 function* getTokens(string) {
   string = removeSpaceCharacters(string);
-  string = replaceUnaryMinus(string);
 
   //We need to replace all unary minuses with neg() function
   //To do that we check if token should be a value (not operator)

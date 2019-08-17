@@ -7,7 +7,7 @@ class AuxOptions extends EventEmitter {
     this.fastMode = false;
     this.scale = 200;
     this.contentScaleFactor = 1;
-    this.saturationRange = 5;
+    this.saturationRange = 0.5;
     this.valueRange = 0;
   }
   
@@ -58,14 +58,14 @@ const saturationRangeSlider = new Slider({
   className: 'saturationRangeSlider',
   value: auxOptions.saturationRange,
   min: 0,
-  max: 100,
+  max: 5,
   lowerBound: 0,
 });
 const valueRangeSlider = new Slider({
   className: 'valueRangeSlider',
   value: auxOptions.valueRange,
   min: 0,
-  max: 100,
+  max: 5,
   lowerBound: 0,
 });
 

@@ -1,4 +1,4 @@
-export const vertexShaderSource = `
+export default `
 attribute vec4 a_position;
 
 varying vec2 v_position;
