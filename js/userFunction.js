@@ -1,15 +1,21 @@
 import {getGLSLFromExpression} from './expressionParser.js';
-import {outputError} from './util.js';
+import {throttle, outputError} from './util.js';
 import FractalRenderer from './FractalRenderer.js';
 import EventEmitter from './EventEmitter.js';
 import auxOptions from './auxOptions.js';
-
+/*
 const DEFAULT_FUNCTION_BODY = `
 vec2 fun(vec2 c) {
   vec2 temp1 = powComplex(c, vec2(10, 0));
   vec2 temp2 = sub(temp1, c);
   vec2 temp3 = mul(temp2, vec2(10, 0));
   return temp3;
+}
+`;
+*/
+const DEFAULT_FUNCTION_BODY = `
+vec2 fun(vec2 c) {
+  return c;
 }
 `;
 
@@ -59,68 +65,7 @@ class UserFunction extends EventEmitter {
 }
 
 const userFunction = new UserFunction();
-/*
-const userFunction = {
-  renderer: null,
-  _listeners: {},
-  
-  init() {
-    this.options = {
-      body: DEFAULT_FUNCTION_BODY,
-      scale: auxOptions.scale,
-      saturationRange: auxOptions.saturationRange,
-      valueRange: auxOptions.valueRange,
-      
-      _width: 100,
-      _height: 100
-    }
-    
-    this._update();
-  },
 
-  changeOptions({
-      body,
-      fastMode,
-      scale,
-      saturationRange,
-      valueRange
-  }) {
-    this.options.body = body?body:this.options.body;
-    this.options.fastMode = fastMode?fastMode:this.options.fastMode;
-    this.options.scale = scale?scale:this.options.scale;
-    this.options.saturationRange =
-        saturationRange?saturationRange:this.options.saturationRange;
-    this.options.valueRange =
-        valueRange?valueRange:this.options.valueRange;
-    
-    if (this.options.fastMode || body) {
-      this._update();
-    }
-  },
-  
-  _update() {
-    this.renderer = new FractalRenderer(this.options);
-    
-    this._emit('change');
-  },
-  
-  on(event, callback) {
-    if (!this._listeners[event]) {
-      this._listeners[event] = [callback];
-    } else {
-      this._listeners[event].push(callback);
-    }
-  },
-
-  _emit(event, data) {
-    if (!this._listeners[event]) {
-      return;
-    } else {
-      this._listeners[event].forEach(callback => callback.call(null, data));
-    }
-  }
-};
-*/
 auxOptions.on('change', options => userFunction.changeOptions(options));
 
 const panel = $('.panel');
@@ -159,6 +104,34 @@ $('.expressionCopyCodeButton').click(function() {
   const currentFunctionBody = getGLSLFromExpression(currentExpression);
 
   navigator.clipboard.writeText(currentFunctionBody);
+});
+
+const container = $('.container');
+const content = $('.content');
+container.on('mousemove', event => {
+  const contentCurrentX = parseInt(content.css('left'));
+  const contentCurrentY = parseInt(content.css('bottom'));
+  
+  let inputX = (-contentCurrentX+event.clientX)/auxOptions.scale;
+  let inputY =
+      (-contentCurrentY+(container.height()-event.clientY))/auxOptions.scale;
+  
+  const arr = userFunction.renderer.getValueAt(inputX, inputY);
+  console.log(arr);
+  
+  /*
+  
+  //Trim result
+  inputX = inputX.toFixed(2);
+  inputY = inputY.toFixed(2);
+  resultX = resultX.toFixed(2);
+  resultY = resultY.toFixed(2);
+
+  const output = `f(${inputX}, ${inputY}) = (${resultX}, ${resultY})`;
+  
+  $('.functionValue').text(output);
+  
+  */
 });
 
 code.text(DEFAULT_FUNCTION_BODY);

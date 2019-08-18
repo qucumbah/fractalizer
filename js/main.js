@@ -1,6 +1,6 @@
 import userFunction from './userFunction.js';
 import auxOptions from './auxOptions.js';
-import {hsvToRgb, outputError, clearErrorOutput} from './util.js';
+import {outputError, clearErrorOutput} from './util.js';
 
 userFunction.on('change', rerender);
 
@@ -74,13 +74,6 @@ function resetDragStart(event) {
 }
 
 /*
-let scale = 200;
-function changeScale(amount) {
-  console.log(scale, 1/scale);
-  scale*=amount;
-  rerender();
-}
-
 function updateFunctionValue(event) {
   let inputX = (-contentCurrentX+event.clientX)/scale;
   let inputY = (-contentCurrentY+(container.height()-event.clientY))/scale;

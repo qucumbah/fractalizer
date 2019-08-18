@@ -1,45 +1,37 @@
-export function hsvToRgb(h, s, v) {
-  const hi = Math.floor((h/60)%6);
-  const vMin = (100-s)*v/100;
-  const a = (v-vMin)*(h%60)/60;
-  const vInc = vMin+a;
-  const vDec = v-a;
-
-  let r, g, b;
-  switch (hi) {
-    case 0:
-      r = v;
-      g = vInc;
-      b = vMin;
-    break;
-    case 1:
-      r = vDec;
-      g = v;
-      b = vMin;
-    break;
-    case 2:
-      r = vMin;
-      g = v;
-      b = vInc;
-    break;
-    case 3:
-      r = vMin;
-      g = vDec;
-      b = v;
-    break;
-    case 4:
-      r = vInc;
-      g = vMin;
-      b = v;
-    break;
-    case 5:
-      r = v;
-      g = vMin;
-      b = vDec;
-    break;
+export function throttle(inner, ms) {
+  let isOnDelay = false;
+  let throttledCall = null;
+  
+  function delay() {
+    setTimeout(() => {
+      if (throttledCall) {
+        inner.apply(throttledCall.savedThis, throttledCall.args);
+        throttledCall = null;
+        delay();
+      } else {
+        isOnDelay = false;
+      }
+    }, ms);
   }
+  
+  return function(...args) {
+    if (!isOnDelay) {
+      inner.apply(this, args);
+      isOnDelay = true;
+      delay();
+    } else {
+      throttledCall = { args, savedThis: this };
+    }
+  }
+}
 
-  return {r, g, b};
+//arr = Uint8Array(8), contains encoded function value at some point
+//For details see fragmentShaderSource encode(). There are two sets of ints
+//(real and imaginary parts) that follow this structure:
+//00eeeeee 00smmmmm 00mmmmmm 00mmmmmm
+//01234567 01234567 01234567 01234567
+export function decode(arr) {
+  
 }
 
 const errorOutput = $('.errorOutput');
