@@ -1,7 +1,7 @@
 export function throttle(inner, ms) {
   let isOnDelay = false;
   let throttledCall = null;
-  
+
   function delay() {
     setTimeout(() => {
       if (throttledCall) {
@@ -13,7 +13,7 @@ export function throttle(inner, ms) {
       }
     }, ms);
   }
-  
+
   return function(...args) {
     if (!isOnDelay) {
       inner.apply(this, args);
@@ -31,7 +31,7 @@ export function throttle(inner, ms) {
 //00eeeeee 00smmmmm 00mmmmmm 00mmmmmm
 //01234567 01234567 01234567 01234567
 export function decode(arr) {
-  
+
 }
 
 const errorOutput = $('.errorOutput');

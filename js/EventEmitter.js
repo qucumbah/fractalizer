@@ -2,7 +2,7 @@ export default class EventEmitter {
   constructor() {
     this._listeners = {};
   }
-  
+
   on(event, callback) {
     if (!this._listeners[event]) {
       this._listeners[event] = [callback];

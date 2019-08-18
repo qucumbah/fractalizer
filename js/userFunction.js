@@ -27,15 +27,15 @@ class UserFunction extends EventEmitter {
       scale: auxOptions.scale,
       saturationRange: auxOptions.saturationRange,
       valueRange: auxOptions.valueRange,
-      
+
       _width: 100,
       _height: 100
     }
     this.renderer = new FractalRenderer(this.options);
-    
+
     this._update();
   }
-  
+
   changeOptions({
       body,
       fastMode,
@@ -51,15 +51,15 @@ class UserFunction extends EventEmitter {
         (saturationRange!==undefined)?saturationRange:this.options.saturationRange;
     this.options.valueRange =
         (valueRange!==undefined)?valueRange:this.options.valueRange;
-    
+
     if (this.options.fastMode || body) {
       this._update();
     }
   }
-  
+
   _update() {
     this.renderer.updateProgram(this.options);
-    
+
     this._emit('change');
   }
 }
@@ -111,16 +111,16 @@ const content = $('.content');
 container.on('mousemove', event => {
   const contentCurrentX = parseInt(content.css('left'));
   const contentCurrentY = parseInt(content.css('bottom'));
-  
+
   let inputX = (-contentCurrentX+event.clientX)/auxOptions.scale;
   let inputY =
       (-contentCurrentY+(container.height()-event.clientY))/auxOptions.scale;
-  
+
   const arr = userFunction.renderer.getValueAt(inputX, inputY);
   console.log(arr);
-  
+
   /*
-  
+
   //Trim result
   inputX = inputX.toFixed(2);
   inputY = inputY.toFixed(2);
@@ -128,9 +128,9 @@ container.on('mousemove', event => {
   resultY = resultY.toFixed(2);
 
   const output = `f(${inputX}, ${inputY}) = (${resultX}, ${resultY})`;
-  
+
   $('.functionValue').text(output);
-  
+
   */
 });
 

@@ -10,7 +10,7 @@ class AuxOptions extends EventEmitter {
     this.saturationRange = 0.5;
     this.valueRange = 0;
   }
-  
+
   update({
     fastMode,
     scale,
@@ -27,7 +27,7 @@ class AuxOptions extends EventEmitter {
         (saturationRange!==undefined)?saturationRange:this.saturationRange;
     this.valueRange =
         (valueRange!==undefined)?valueRange:this.valueRange;
-    
+
     this._emit('change', this);
   }
 }
@@ -81,19 +81,19 @@ function setFakeScale(amount, mouseOffset) {
   if (amount <= 0) {
     return;
   }
-  
+
   if (!initialScale) {
     initialScale = auxOptions.scale;
   }
-  
+
   const oldScaleFactor = fakeScale / initialScale;
   fakeScale = amount;
   const newScaleFactor = fakeScale / initialScale;
-  
+
   if (!auxOptions.fastMode) {
     auxOptions.update({ contentScaleFactor: newScaleFactor });
   }
-  
+
   //Center of scaling should stay in place
   const centerOfScalingOffset = mouseOffset?mouseOffset:{
     bottom: container.height() / 2,
@@ -103,13 +103,13 @@ function setFakeScale(amount, mouseOffset) {
     bottom: parseFloat(content.css('bottom')),
     left: parseFloat(content.css('left'))
   };
-  
+
   const f = newScaleFactor / oldScaleFactor;
   const changeBottom =
       (contentOffset.bottom - centerOfScalingOffset.bottom) * (f-1);
   const changeLeft =
       (contentOffset.left - centerOfScalingOffset.left) * (f-1);
-  
+
   //change = (content - centerOfScaling) * newScaleFactor / oldScaleFactor;
   //console.log(f, centerOfScalingOffset, contentOffset, changeBottom, changeLeft);
   content.css({
@@ -142,20 +142,20 @@ scaleSlider.on('change', event => {
 });
 $('.container').on('wheel', event => {
   const DEFAULT_AMOUNT = 1.1;
-  
+
   const amount = event.originalEvent.deltaY;
-  
+
   const mouseOffset = {
     bottom: container.height() - event.offsetY,
     left: event.offsetX
   }
-  
+
   if (amount>0) {
     setFakeScale(fakeScale / DEFAULT_AMOUNT, mouseOffset);
   } else {
     setFakeScale(fakeScale * DEFAULT_AMOUNT, mouseOffset);
   }
-  
+
   scaleSlider.val(fakeScale);
   //setActualScale();
 });

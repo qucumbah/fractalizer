@@ -10,16 +10,16 @@ float E  = 2.718281828459045;
 
 vec2 cartesianToPolar(vec2 v) {
   float s = v.x*v.x + v.y*v.y;
-  
+
   if (s <= 0.0) {
     return vec2(0, 0);
   }
-  
+
   float r = sqrt(s);
   float a = v.y>=0.0 ? acos(v.x/r) : PI*2.0-acos(v.x/r);
-  
+
   //a = clamp(a, 0.0, PI*2.0);
-  
+
   return vec2(r, a);
 }
 vec2 polarToCartesian(float r, float a) {
@@ -39,7 +39,7 @@ vec2 sub(vec2 a, vec2 b) {
 vec2 mul(vec2 a, vec2 b) {
   vec2 aPolar = cartesianToPolar(a);
   vec2 bPolar = cartesianToPolar(b);
-  
+
   return polarToCartesian(
     aPolar[0] * bPolar[0],
     aPolar[1] + bPolar[1]
@@ -48,7 +48,7 @@ vec2 mul(vec2 a, vec2 b) {
 vec2 div(vec2 a, vec2 b) {
   vec2 aPolar = cartesianToPolar(a);
   vec2 bPolar = cartesianToPolar(b);
-  
+
   return polarToCartesian(
     aPolar[0] / bPolar[0],
     aPolar[1] - bPolar[1]
@@ -59,16 +59,16 @@ vec2 powComplex(vec2 v1, vec2 v2) {
   if (v1.x == 0.0 && v1.y == 0.0) {
     return vec2(0, 0);
   }
-  
+
   vec2 polar = cartesianToPolar(v1);
   float a = polar[1];
   float r = polar[0];
   float c = v2.x;
   float d = v2.y;
-  
+
   float resultRadius = pow(r, c) * pow(E, -d*a);
   float resultAngle = d*log(r) + c*a;
-  
+
   return polarToCartesian(resultRadius, resultAngle);
 }
 
@@ -99,9 +99,9 @@ vec3 hsvToRgb(float h, float s, float v) {
   float a = (v-vMin)*mod(h, 60.0)/60.0;
   float vInc = vMin+a;
   float vDec = v-a;
-  
+
   float r, g, b;
-  
+
   if (hi==0) {
     r = v;
     g = vInc;
@@ -127,16 +127,16 @@ vec3 hsvToRgb(float h, float s, float v) {
     g = vMin;
     b = vDec;
   }
-  
+
   return vec3(r/100.0, g/100.0, b/100.0);
-  
+
   /*
   const hi = Math.floor((h/60)%6);
   const vMin = (100-s)*v/100;
   const a = (v-vMin)*(h%60)/60;
   const vInc = vMin+a;
   const vDec = v-a;
-  
+
   switch (hi) {
     case 0:
       r = v;
@@ -198,7 +198,7 @@ uniform int u_returnType;
 vec4 getColor() {
   float halfImageWidth = u_imageSize.x / 2.0;
   float halfImageHeight = u_imageSize.y / 2.0;
-  
+
   //No idea why I called this bottom left btw
   vec2 bottomLeft = vec2(
     v_position.x*halfImageWidth + halfImageWidth + u_offset.x,
@@ -206,18 +206,18 @@ vec4 getColor() {
   );
   vec2 complex = mul( bottomLeft, vec2(1.0/u_scale, 0) );
   vec2 polar = cartesianToPolar( fun(complex) );
-  
+
   //This is the record-holding longest line of code in the entire fractalizer
   //code base, spanning 109 characters
   float saturation = u_saturationRange==0.0 ? 100.0 : clamp(polar[0] / u_saturationRange, 0.0, 1.0) * 100.0;
   float value = u_valueRange==0.0 ? 100.0 : clamp(polar[0] / u_valueRange, 0.0, 1.0) * 100.0;
-  
+
   vec3 rgb = hsvToRgb(
     polar[1] / PI * 180.0,
     saturation,
     value
   );
-  
+
   return vec4(rgb, 1);
 }
 
@@ -235,14 +235,14 @@ vec2 getValue() {
 vec4 encode(float v) {
   bool negative = (v < 0.0);
   v = abs(v);
-  
+
   if (v == 0.0) {
     return vec4(0, 0, 0, 0);
   }
-  
+
   //Exponent is just a floor of a log2 of value
   float exp = floor( log2(v) ) + 32.0;
-  
+
   float maxExp = 64.0;
   if (exp > maxExp) {
     //Exponent too big to store in 6 bits, consider number +inf
@@ -252,9 +252,9 @@ vec4 encode(float v) {
     //Exponent too small to store in 6 bits, consider number -inf
     return vec4(1, 1, 1, 1);
   }
-  
+
   float man = v / pow(2.0, exp-32.0);
-  
+
   //man is in [1; 2) now, so lets 'stretch' it to fit [2^17, 2^18) (so that
   //we can encode it as 17 bit, 6 bits per channel and one bit saved for sign)
   man = floor( man * 131072.0 );
@@ -265,13 +265,13 @@ vec4 encode(float v) {
   man = floor(man / 64.0);
   //The leading bit gets thrown away, as its always 1
   man3.x = mod(man - 32.0, 64.0);
-  
+
   //As in the diagram above, lets replace the useless leading bit of mantissa
   //with the sign bit
   if (negative) {
     man3.x += 32.0;
   }
-  
+
   return vec4(exp, man3);
 }
 
@@ -280,12 +280,12 @@ void main() {
     gl_FragColor = getColor();
   } else {
     vec2 value = getValue();
-    
+
     //Pixel (0, 0), store real part
     if (v_position.x == -1.0) {
       gl_FragColor = encode(value.x) / 64.0;
     }
-    
+
     //Pixel (1, 0), store imaginary part
     if (v_position.x == 1.0) {
       gl_FragColor = encode(value.y) / 64.0;

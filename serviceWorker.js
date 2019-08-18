@@ -20,5 +20,5 @@ const files = [
 ];
 
 self.addEventListener('install', function(event) {
-  
+
 });

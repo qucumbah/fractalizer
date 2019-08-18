@@ -54,9 +54,9 @@ export function getGLSLFromExpression(expression) {
   }
 
   result += `return temp${numberOfTempResults};`;
-  
+
   result = 'vec2 fun(vec2 c) {\n' + result + '\n}';
-  
+
   console.log(result);
 
   return result;
@@ -260,7 +260,7 @@ function* getTokens(string) {
     } else {
       //Token is one of the known constant tokens
       string = string.slice(token.length);
-      
+
       //Check for unary minus
       const expectValue = (
         !last ||
@@ -274,7 +274,7 @@ function* getTokens(string) {
         console.log(last);
         token = 'neg';
       }
-      
+
       /*
       1 + sin -5
       //Check for unary minus

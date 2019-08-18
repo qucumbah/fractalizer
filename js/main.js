@@ -88,13 +88,13 @@ function updateFunctionValue(event) {
   resultY = resultY.toFixed(2);
 
   const output = `f(${inputX}, ${inputY}) = (${resultX}, ${resultY})`;
-  
+
   $('.functionValue').text(output);
 }
 */
 function rerender() {
   content.css('transform', 'scale(1)');
-  
+
   updateContentCurrentPosition();
   clearRenderedBlocks();
   clearErrorOutput();
@@ -116,16 +116,16 @@ function updateScreen() {
     x: -contentCurrentX + screenWidth,
     y: -contentCurrentY + screenHeight
   };
-  
+
   console.log(screenBottomLeft, screenTopRight);
   */
-  
+
   const scale = auxOptions.contentScaleFactor;
   const distanceToCenter = {
     x: ( screenWidth/2 - contentCurrentX ) / scale,
     y: ( screenHeight/2 - contentCurrentY ) / scale
   };
-  
+
   const screenBottomLeft = {
     x: distanceToCenter.x - screenWidth/2,
     y: distanceToCenter.y - screenHeight/2
@@ -135,7 +135,7 @@ function updateScreen() {
     y: distanceToCenter.y + screenHeight/2
   }
   //console.log(contentCurrentX, contentCurrentY, scale, distanceToCenter, screenBottomLeft, screenTopRight);
-  
+
   const bottomLeftSquare = getSquare(screenBottomLeft);
   const topRightSquare = getSquare(screenTopRight);
   for (let x = bottomLeftSquare.x; x<=topRightSquare.x; x++) {
@@ -150,7 +150,7 @@ function updateScreen() {
       }
     }
   }
-  
+
 }
 
 function clearRenderedBlocks() {
@@ -182,7 +182,7 @@ function isRendered(x, y) {
 function renderBlock(x, y) {
   const block = { x, y }
   renderedBlocks.push(block);
-  
+
   userFunction.renderer.getImage(x * imageWidth, y * imageHeight)
     .then(blob => {
       //Block has been marked 'dead' in clearRenderedBlocks(), which means that
@@ -192,7 +192,7 @@ function renderBlock(x, y) {
         return;
       }
       const objectURL = URL.createObjectURL(blob);
-      
+
       const img = $('<img>', {
         src: objectURL,
         class: 'block'
@@ -205,7 +205,7 @@ function renderBlock(x, y) {
         width: imageWidth + 1,
         height: imageHeight + 1
       });
-      
+
       content.append(img);
       block.object = img;
       block.objectURL = objectURL;
@@ -218,12 +218,12 @@ function renderBlock(x, y) {
 function renderBlock(x, y) {
   const block = { x, y }
   renderedBlocks.push(block);
-  
+
   try {
     const domImg = userFunction.renderer.getImage(x * imageWidth, y * imageHeight);
     const img = $(domImg);
     img.toggleClass('block');
-    
+
     //Add small numbers to fix 1px gap between images
     img.css({
       left: x*imageWidth - 0.5,

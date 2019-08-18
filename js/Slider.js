@@ -8,12 +8,12 @@ export default class Slider extends EventEmitter {
     this._valueInput = $('.' + className + ' .value');
     this._minInput = $('.' + className + ' .min');
     this._maxInput = $('.' + className + ' .max');
-    
+
     //All of these should be gotten or set using val(), minVal() and maxVal()
     this._value = value;
     this._min = min;
     this._max = max;
-    
+
     //Bounds, in case there is any
     if (lowerBound !== undefined) {
       this._lowerBound = lowerBound;
@@ -21,17 +21,17 @@ export default class Slider extends EventEmitter {
     if (lowerBound !== undefined) {
       this._upperBound = upperBound;
     }
-    
+
     //Update inputs at creation
     this._updateInputs();
-    
+
     //If user enters wrong values into our input fields, we have to reset them
     //to our actual model values
     this.on('_inputError', this._updateInputs);
     //Same if the change is successful, we only changed our model's values, not
     //input's
     this.on('_inputSuccess', this._updateInputs);
-    
+
     this._slider.on('input', event => {
       //Dont send event, we dont need users to use event.target.value, that would
       //return a value in range 0-100 that doesn't reflect actual state of the
@@ -40,7 +40,7 @@ export default class Slider extends EventEmitter {
       this.val( this._getValueFromSlider() );
     });
     this._slider.on('change', event => this._emit('change'));
-    
+
     //We can change the value directly through the input field, but we have to
     //be careful with boundaries
     this._valueInput.on('change', event => {
@@ -68,22 +68,22 @@ export default class Slider extends EventEmitter {
       this.maxVal(newValue);
     });
   }
-  
+
   _updateInputs = () => {
     this._slider.val( this._getSliderValue() );
     this._valueInput.val( this.val() );
     this._minInput.val( this._min );
     this._maxInput.val( this._max );
-    
+
     this._emit('input');
     this._emit('change');
   }
-  
+
   //Value in range 0-100 relative to min and max
   _getSliderValue = () => {
     return ( (this._value - this._min) / (this._max - this._min) ) * 100;
   }
-  
+
   //Convert slider values (0-100) to actual value
   _getValueFromSlider = () => {
     const result = this._min + (this._max - this._min) * (this._slider.val() / 100);
@@ -99,24 +99,24 @@ export default class Slider extends EventEmitter {
       return this._value;
     }
   }
-  
+
   _setValue = newValue => {
     if (newValue < this._lowerBound || newValue > this._upperBound) {
       //Invalid argument
       this._emit('_inputError');
       return;
     }
-    
+
     if (newValue <= this._min) {
       this._min = newValue;
     } else if (newValue >= this._max) {
       this._max = newValue;
     }
-    
+
     this._value = newValue;
     this._emit('_inputSuccess');
   }
-  
+
   minVal = newValue => {
     if (newValue !== undefined) {
       //Setter mode
@@ -135,24 +135,24 @@ export default class Slider extends EventEmitter {
       return this._max;
     }
   }
-  
+
   _setMinValue = newValue => {
     if (newValue < this._lowerBound || newValue > this._upperBound) {
       //Invalid argument
       this._emit('_inputError');
       return;
     }
-    
+
     if (newValue >= this._max) {
       this._max = newValue;
     }
-    
+
     if (newValue >= this._value) {
       this._value = newValue;
     }
-    
+
     this._min = newValue;
-    
+
     this._emit('_inputSuccess');
   }
   _setMaxValue = newValue => {
@@ -161,17 +161,17 @@ export default class Slider extends EventEmitter {
       this._emit('_inputError');
       return;
     }
-    
+
     if (newValue <= this._min) {
       this._min = newValue;
     }
-    
+
     if (newValue <= this._value) {
       this._value = newValue;
     }
-    
+
     this._max = newValue;
-    
+
     this._emit('_inputSuccess');
   }
 }
