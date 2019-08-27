@@ -1,5 +1,6 @@
 import vertexShaderSource from './glsl/vertexShaderSource.js';
 import fragmentShaderSource from './glsl/fragmentShaderSource.js';
+import {decode} from './util.js';
 
 export default class FractalRenderer {
   constructor({
@@ -34,7 +35,13 @@ export default class FractalRenderer {
     const arr = new Uint8Array(8);
     this.gl.readPixels(0, 0, 2, 1, this.gl.RGBA, this.gl.UNSIGNED_BYTE, arr);
 
-    return arr;
+    const real = [arr[0], arr[1], arr[2], arr[3]];
+    const imag = [arr[4], arr[5], arr[6], arr[7]];
+
+    const realFloat = decode(real);
+    const imagFloat = decode(imag);
+
+    return { x: realFloat, y: imagFloat };
   }
 
   getImage(x, y) {
@@ -55,7 +62,7 @@ function createCanvas(width, height) {
 }
 
 function getGL(canvas) {
-  const gl = canvas.getContext('webgl');
+  const gl = canvas.getContext('webgl2');
 
   if (!gl) {
     throw new Error('Error: webgl not supported');
@@ -137,6 +144,7 @@ function getValueAt(gl, program, x, y) {
   const offset = 0;
   const count = 2;
 
+  gl.clearColor(0, 0, 0, 0);
   gl.drawArrays(primitiveType, offset, count);
 }
 

@@ -31,7 +31,11 @@ export function throttle(inner, ms) {
 //00eeeeee 00smmmmm 00mmmmmm 00mmmmmm
 //01234567 01234567 01234567 01234567
 export function decode(arr) {
+  const man = arr[3] % 64 + arr[2] % 64 * 64 + ( arr[1] % 32 + 32 ) * 4096;
+  const sig = Math.floor( arr[1] / 32 ) >= 1 ? -1 : 1;
+  const exp = arr[0] % 64;
 
+  return sig * Math.pow(2, exp - 32) * man/131072;
 }
 
 const errorOutput = $('.errorOutput');

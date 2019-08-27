@@ -3,7 +3,7 @@ import {throttle, outputError} from './util.js';
 import FractalRenderer from './FractalRenderer.js';
 import EventEmitter from './EventEmitter.js';
 import auxOptions from './auxOptions.js';
-/*
+
 const DEFAULT_FUNCTION_BODY = `
 vec2 fun(vec2 c) {
   vec2 temp1 = powComplex(c, vec2(10, 0));
@@ -12,12 +12,12 @@ vec2 fun(vec2 c) {
   return temp3;
 }
 `;
-*/
-const DEFAULT_FUNCTION_BODY = `
-vec2 fun(vec2 c) {
-  return c;
-}
-`;
+
+// const DEFAULT_FUNCTION_BODY = `
+// vec2 fun(vec2 c) {
+//   return c;
+// }
+// `;
 
 class UserFunction extends EventEmitter {
   constructor() {
@@ -32,6 +32,9 @@ class UserFunction extends EventEmitter {
       _height: 100
     }
     this.renderer = new FractalRenderer(this.options);
+    //This is becoming really messy, but there are some bugs that I have to fix
+    //right now if I want fractalizer to stay alive, so there's that
+    this.valueCalculator = new FractalRenderer(this.options);
 
     this._update();
   }
@@ -59,6 +62,7 @@ class UserFunction extends EventEmitter {
 
   _update() {
     this.renderer.updateProgram(this.options);
+    this.valueCalculator.updateProgram(this.options);
 
     this._emit('change');
   }
@@ -105,6 +109,24 @@ $('.expressionCopyCodeButton').click(function() {
 
   navigator.clipboard.writeText(currentFunctionBody);
 });
+/*
+const arr = userFunction.renderer.getValueAt(3, 0);
+console.log(arr);
+*/
+
+const displayFunctionValue = throttle(
+  function(inputX, inputY, resultX, resultY) {
+    //Trim result
+    inputX = inputX.toFixed(2);
+    inputY = inputY.toFixed(2);
+    resultX = resultX.toFixed(2);
+    resultY = resultY.toFixed(2);
+
+    const output = `f(${inputX}, ${inputY}) = (${resultX}, ${resultY})`;
+
+    $('.functionValue').text(output);
+  }
+);
 
 const container = $('.container');
 const content = $('.content');
@@ -116,7 +138,7 @@ container.on('mousemove', event => {
   let inputY =
       (-contentCurrentY+(container.height()-event.clientY))/auxOptions.scale;
 
-  const arr = userFunction.renderer.getValueAt(inputX, inputY);
+  const arr = userFunction.valueCalculator.getValueAt(inputX, inputY);
   console.log(arr);
 
   /*
@@ -133,6 +155,8 @@ container.on('mousemove', event => {
 
   */
 });
+
+
 
 code.text(DEFAULT_FUNCTION_BODY);
 const DEFAULT_EXPRESSION_BODY = '(c^10 - c)*10';

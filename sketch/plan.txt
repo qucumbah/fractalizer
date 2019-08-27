@@ -13,10 +13,12 @@ TODOS:
 8) Scale to Slider piping V
 9) Change scale units V
 10) Web app manifest V
-11) Add back function value
+11) Add back function value V
 12) Give user ability to set X and Y manually
 13) Message system
 14) Loader
+15) Add scale buttons
+16) Change scale units in sliders
 
 Fractalibrary
 c^{-1;-1} - whirlwind

@@ -5,14 +5,15 @@ body {
   overflow: hidden;
 }
 
-/*
-.container {
-  width: 100vw;
-  height: 100vh;
-  position: relative;
-  overflow: hidden;
+.functionValue {
+  position: absolute;
+  z-index: 2;
+  display: inline-block;
+  padding: 5px;
+  background-color: white;
+  border-radius: 0px 0px 10px 0px;
 }
-*/
+
 .container {
   width: 100vw;
   height: 100vh;

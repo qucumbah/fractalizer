@@ -16,9 +16,12 @@ vec2 cartesianToPolar(vec2 v) {
   }
 
   float r = sqrt(s);
-  float a = v.y>=0.0 ? acos(v.x/r) : PI*2.0-acos(v.x/r);
 
-  //a = clamp(a, 0.0, PI*2.0);
+  //This thing almost killed fractalizer, without it there are awful artifacts
+  //in places where x is close to 0
+  float rel = clamp(v.x/r, -1.0, 1.0);
+
+  float a = v.y>=0.0 ? acos(rel) : PI*2.0-acos(rel);
 
   return vec2(r, a);
 }
@@ -206,6 +209,10 @@ vec4 getColor() {
   );
   vec2 complex = mul( bottomLeft, vec2(1.0/u_scale, 0) );
   vec2 polar = cartesianToPolar( fun(complex) );
+
+  // if (polar.x <= 5.0 || polar.y > PI*2.0 || polar.y < 0.0) {
+  //   return vec4(0,0,0,1);
+  // }
 
   //This is the record-holding longest line of code in the entire fractalizer
   //code base, spanning 109 characters
