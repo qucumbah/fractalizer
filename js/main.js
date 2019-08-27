@@ -11,9 +11,9 @@ const content = $('.content');
 content.css('left', container.width() / 2);
 content.css('bottom', container.height() / 2);
 
-container.on('mousedown', startDrag);
-container.on('mouseup', stopDrag);
-container.on('mousemove', drag);
+container.on('mousedown touchstart', startDrag);
+container.on('mouseup touchend touchcancel', stopDrag);
+container.on('mousemove touchmove', drag);
 container.on('wheel', resetDragStart);
 /*
 container.on('wheel', function(event) {
@@ -44,11 +44,19 @@ function updateContentCurrentPosition() {
 updateContentCurrentPosition();
 
 function drag(event) {
-  //updateFunctionValue(event);
+  let changeX, changeY;
+
+  if (event.type === 'touchmove') {
+    changeX = event.changedTouches[0].clientX - dragStartX;
+    changeY = event.changedTouches[0].clientY - dragStartY;
+  } else {
+    changeX = event.clientX - dragStartX;
+    changeY = event.clientY - dragStartY;
+  }
 
   if (isDragging) {
-    contentCurrentX = contentStartX+event.clientX-dragStartX;
-    contentCurrentY = contentStartY-event.clientY+dragStartY;
+    contentCurrentX = contentStartX + changeX;
+    contentCurrentY = contentStartY - changeY;
 
     content.css('left', contentCurrentX);
     content.css('bottom', contentCurrentY);
@@ -67,8 +75,14 @@ function stopDrag() {
 
 //Need this to sync plane movement with drag after rescaling it
 function resetDragStart(event) {
-  dragStartX = event.clientX;
-  dragStartY = event.clientY;
+  if (event.type === 'touchstart') {
+    dragStartX = event.changedTouches[0].clientX;
+    dragStartY = event.changedTouches[0].clientY;
+  } else {
+    dragStartX = event.clientX;
+    dragStartY = event.clientY;
+  }
+
   contentStartX = parseInt(content.css('left'));
   contentStartY = parseInt(content.css('bottom'));
 }

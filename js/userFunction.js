@@ -125,38 +125,32 @@ const displayFunctionValue = throttle(
     const output = `f(${inputX}, ${inputY}) = (${resultX}, ${resultY})`;
 
     $('.functionValue').text(output);
-  }
+  },
+  1000/60 //ms in one frame
 );
 
 const container = $('.container');
 const content = $('.content');
-container.on('mousemove', event => {
+container.on('mousemove touchmove', event => {
   const contentCurrentX = parseInt(content.css('left'));
   const contentCurrentY = parseInt(content.css('bottom'));
 
-  let inputX = (-contentCurrentX+event.clientX)/auxOptions.scale;
-  let inputY =
-      (-contentCurrentY+(container.height()-event.clientY))/auxOptions.scale;
+  let x, y;
+  if (event.type === 'touchmove') {
+    x = event.changedTouches[0].clientX;
+    y = event.changedTouches[0].clientY;
+  } else {
+    x = event.clientX;
+    y = event.clientY;
+  }
+
+  let inputX = (-contentCurrentX + x) / auxOptions.scale;
+  let inputY = (-contentCurrentY + (container.height() - y)) / auxOptions.scale;
 
   const arr = userFunction.valueCalculator.getValueAt(inputX, inputY);
-  console.log(arr);
 
-  /*
-
-  //Trim result
-  inputX = inputX.toFixed(2);
-  inputY = inputY.toFixed(2);
-  resultX = resultX.toFixed(2);
-  resultY = resultY.toFixed(2);
-
-  const output = `f(${inputX}, ${inputY}) = (${resultX}, ${resultY})`;
-
-  $('.functionValue').text(output);
-
-  */
+  displayFunctionValue(inputX, inputY, arr.x, arr.y);
 });
-
-
 
 code.text(DEFAULT_FUNCTION_BODY);
 const DEFAULT_EXPRESSION_BODY = '(c^10 - c)*10';
