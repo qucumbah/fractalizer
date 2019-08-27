@@ -17,7 +17,7 @@ TODOS:
 12) Give user ability to set X and Y manually
 13) Message system
 14) Loader
-15) Add scale buttons
+15) Add scale buttons V
 16) Change scale units in sliders V
 
 Fractalibrary

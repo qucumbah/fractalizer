@@ -141,9 +141,22 @@ scaleSlider.on('input', event => {
 scaleSlider.on('change', event => {
   setActualScale();
 });
-$('.container').on('wheel', event => {
-  const DEFAULT_AMOUNT = 1.1;
 
+const DEFAULT_AMOUNT = 1.1;
+function zoomIn(mouseOffset) {
+  setFakeScale(fakeScale * DEFAULT_AMOUNT, mouseOffset);
+
+  scaleSlider.val(fakeScale);
+  setActualScale();
+}
+function zoomOut(mouseOffset) {
+  setFakeScale(fakeScale / DEFAULT_AMOUNT, mouseOffset);
+
+  scaleSlider.val(fakeScale);
+  setActualScale();
+}
+
+$('.container').on('wheel', event => {
   const amount = event.originalEvent.deltaY;
 
   const mouseOffset = {
@@ -152,14 +165,17 @@ $('.container').on('wheel', event => {
   }
 
   if (amount>0) {
-    setFakeScale(fakeScale / DEFAULT_AMOUNT, mouseOffset);
+    zoomOut(mouseOffset);
   } else {
-    setFakeScale(fakeScale * DEFAULT_AMOUNT, mouseOffset);
+    zoomIn(mouseOffset);
   }
-
-  scaleSlider.val(fakeScale);
-  //setActualScale();
 });
+
+const zoomInButton = $('.zoomInButton');
+const zoomOutButton = $('.zoomOutButton');
+
+zoomInButton.on('click', () => zoomIn());
+zoomOutButton.on('click', () => zoomOut());
 
 saturationRangeSlider.on('change', function() {
   auxOptions.update({ saturationRange: saturationRangeSlider.val() });
