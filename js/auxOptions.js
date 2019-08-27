@@ -1,5 +1,6 @@
 import EventEmitter from './EventEmitter.js';
 import Slider from './Slider.js';
+import ScaleSlider from './ScaleSlider.js';
 
 class AuxOptions extends EventEmitter {
   constructor() {
@@ -47,7 +48,7 @@ const scaleSlider = new Slider('scaleSlider', auxOptions.scale, 100, 300);
 const saturationRangeSlider = new Slider('saturationRangeSlider');
 const valueRangeSlider = new Slider('valueRangeSlider');
 */
-const scaleSlider = new Slider({
+const scaleSlider = new ScaleSlider({
   className: 'scaleSlider',
   value: auxOptions.scale,
   min: auxOptions.scale - 100,
@@ -135,7 +136,7 @@ runButtons.on('click', event => {
 });
 
 scaleSlider.on('input', event => {
-  setFakeScale( scaleSlider.val() );
+  setFakeScale( scaleSlider.actualVal() );
 });
 scaleSlider.on('change', event => {
   setActualScale();

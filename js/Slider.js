@@ -9,7 +9,7 @@ export default class Slider extends EventEmitter {
     this._minInput = $('.' + className + ' .min');
     this._maxInput = $('.' + className + ' .max');
 
-    //All of these should be gotten or set using val(), minVal() and maxVal()
+    //All of these should be gotten or set using val(), min() and max()
     this._value = value;
     this._min = min;
     this._max = max;
@@ -57,7 +57,7 @@ export default class Slider extends EventEmitter {
         this._emit('_inputError');
         return;
       }
-      this.minVal(newValue);
+      this.min(newValue);
     });
     this._maxInput.on('change', event => {
       const newValue = +this._maxInput.val();
@@ -65,15 +65,17 @@ export default class Slider extends EventEmitter {
         this._emit('_inputError');
         return;
       }
-      this.maxVal(newValue);
+      this.max(newValue);
     });
   }
 
   _updateInputs = () => {
     this._slider.val( this._getSliderValue() );
     this._valueInput.val( this.val() );
-    this._minInput.val( this._min );
-    this._maxInput.val( this._max );
+    this._minInput.val( this.min() );
+    this._maxInput.val( this.max() );
+
+    // console.log(this.val(), this.min(), this.max());
 
     this._emit('input');
     this._emit('change');
@@ -86,21 +88,23 @@ export default class Slider extends EventEmitter {
 
   //Convert slider values (0-100) to actual value
   _getValueFromSlider = () => {
-    const result = this._min + (this._max - this._min) * (this._slider.val() / 100);
-    return (result);
+    const result = (
+      this._min + (this._max - this._min) * (this._slider.val() / 100)
+    );
+    return result;
   }
 
   val = newValue => {
     if (newValue !== undefined) {
       //Setter mode
-      this._setValue(newValue);
+      this._setVal(newValue);
     } else {
       //Getter mode
       return this._value;
     }
   }
 
-  _setValue = newValue => {
+  _setVal = newValue => {
     if (newValue < this._lowerBound || newValue > this._upperBound) {
       //Invalid argument
       this._emit('_inputError');
@@ -117,26 +121,26 @@ export default class Slider extends EventEmitter {
     this._emit('_inputSuccess');
   }
 
-  minVal = newValue => {
+  min = newValue => {
     if (newValue !== undefined) {
       //Setter mode
-      this._setMinValue(newValue);
+      this._setMin(newValue);
     } else {
       //Getter mode
       return this._min;
     }
   }
-  maxVal = newValue => {
+  max = newValue => {
     if (newValue !== undefined) {
       //Setter mode
-      this._setMaxValue(newValue);
+      this._setMax(newValue);
     } else {
       //Getter mode
       return this._max;
     }
   }
 
-  _setMinValue = newValue => {
+  _setMin = newValue => {
     if (newValue < this._lowerBound || newValue > this._upperBound) {
       //Invalid argument
       this._emit('_inputError');
@@ -155,7 +159,7 @@ export default class Slider extends EventEmitter {
 
     this._emit('_inputSuccess');
   }
-  _setMaxValue = newValue => {
+  _setMax = newValue => {
     if (newValue < this._lowerBound || newValue > this._upperBound) {
       //Invalid argument
       this._emit('_inputError');

@@ -18,7 +18,7 @@ TODOS:
 13) Message system
 14) Loader
 15) Add scale buttons
-16) Change scale units in sliders
+16) Change scale units in sliders V
 
 Fractalibrary
 c^{-1;-1} - whirlwind
