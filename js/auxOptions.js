@@ -1,6 +1,7 @@
 import EventEmitter from './EventEmitter.js';
 import Slider from './Slider.js';
 import ScaleSlider from './ScaleSlider.js';
+import modal from './modal.js';
 
 class AuxOptions extends EventEmitter {
   constructor() {
@@ -183,5 +184,57 @@ saturationRangeSlider.on('change', function() {
 valueRangeSlider.on('change', function() {
   auxOptions.update({ valueRange: valueRangeSlider.val() });
 });
+
+const navigateButton = $('.navigateButton');
+navigateButton.on('click', ()=>showNavigateModal());
+
+function showNavigateModal() {
+  const modalContent = [];
+
+  const real = $('<div>');
+  const realName = $('<div>', {class: 'name', text: 'Real:'});
+  const realInput = $('<input>');
+  real.append(realName);
+  real.append(realInput);
+
+  const imag = $('<div>');
+  const imagName = $('<div>', {class: 'name', text: 'Imaginary:'});
+  const imagInput = $('<input>');
+  imag.append(imagName);
+  imag.append(imagInput);
+
+  modalContent.push(real, imag);
+
+  modal.setTitle('Go to position');
+  modal.setContent(modalContent);
+
+  modal.off('cancel');
+  modal.off('submit');
+
+  modal.on('cancel', () => modal.hide());
+  modal.on('submit', () => {
+    const x = parseFloat( realInput.val() );
+    const y = parseFloat( imagInput.val() );
+    if ( isNaN(x) || isNaN(y) ) {
+      const newModalContent = [];
+      const error = $('<div>', {
+        class: 'error',
+        text: 'Please enter valid numbers'
+      });
+      newModalContent.push(real, imag, error);
+      modal.setContent(newModalContent);
+      return;
+    }
+    modal.hide();
+    setContentPosition(x, y);
+  });
+
+  modal.show();
+}
+
+function setContentPosition(x, y) {
+  content.css('left', x * -auxOptions.scale);
+  content.css('bottom', y * -auxOptions.scale);
+}
 
 export default auxOptions;

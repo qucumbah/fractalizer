@@ -14,12 +14,13 @@ TODOS:
 9) Change scale units V
 10) Web app manifest V
 11) Add back function value V
-12) Give user ability to set X and Y manually
+12) Give user ability to set X and Y manually V
 13) Message system V
 14) Loader - not needed, loading is too fast X
 15) Add scale buttons V
 16) Change scale units in sliders V
 17) Smooth animations
+18) Rewrite content position
 
 Fractalibrary
 c^{-1;-1} - whirlwind

@@ -6,6 +6,54 @@ body {
   position: fixed;
 }
 
+/* Modal */
+
+.modal {
+  position: absolute;
+  height: 100%;
+  width: 100%;
+  z-index: 100;
+}
+
+.modal .darken {
+  position: absolute;
+  height: 100%;
+  width: 100%;
+  background-color: rgba(0, 0, 0, 0.7);
+}
+
+.modal .modalWrapper {
+  position: absolute;
+  padding: 15px;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background-color: white;
+  border-radius: 10px;
+}
+
+.modal .modalTitle {
+  margin: 0;
+}
+
+.modal .modalContent {
+  margin: 15px 0;
+}
+
+.modal .buttons {
+  display: flex;
+  justify-content: flex-end;
+}
+.modal .buttons .button {
+  cursor: pointer;
+  padding: 5px;
+  border-radius: 10px;
+  border: 1px solid black;
+  margin-left: 5px;
+}
+
+/* Messages */
+
 .messages {
   height: 100%;
   position: absolute;
@@ -82,6 +130,8 @@ body {
   cursor: pointer;
 }
 
+/* Other controls */
+
 .functionValue {
   position: absolute;
   z-index: 2;
@@ -119,6 +169,8 @@ body {
   margin-bottom: 0px;
 }
 
+/* Content & content container */
+
 .container {
   width: 100%;
   height: 100%;
@@ -141,6 +193,8 @@ body {
   user-select: none;
   position: absolute;
 }
+
+/* Main control panel */
 
 .panel {
   position: absolute;

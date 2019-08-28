@@ -198,6 +198,7 @@ function isRendered(x, y) {
   return renderedBlocks.some(block => block.x===x && block.y===y);
 }
 
+//See sketch 1
 async function renderBlock(x, y) {
   const block = { x, y }
   renderedBlocks.push(block);
@@ -232,31 +233,6 @@ async function renderBlock(x, y) {
     // .catch(outputError);
 }
 
-//See sketch 1
-/*
-function renderBlock(x, y) {
-  const block = { x, y }
-  renderedBlocks.push(block);
-
-  try {
-    const domImg = userFunction.renderer.getImage(x * imageWidth, y * imageHeight);
-    const img = $(domImg);
-    img.toggleClass('block');
-
-    //Add small numbers to fix 1px gap between images
-    img.css({
-      left: x*imageWidth - 0.5,
-      bottom: y*imageHeight - 0.5,
-      width: imageWidth + 1,
-      height: imageHeight + 1
-    });
-    content.append(img);
-    block.object = img;
-  } catch (e) {
-    outputError(e);
-  }
-}
-*/
 /*
 displayMessage({
   icon: 'info',
@@ -277,4 +253,5 @@ displayMessage({
   }
 });
 */
+
 rerender();
