@@ -1,6 +1,6 @@
 import userFunction from './userFunction.js';
 import auxOptions from './auxOptions.js';
-import {outputError, clearErrorOutput} from './util.js';
+import {outputError, clearErrorOutput, displayMessage} from './util.js';
 
 userFunction.on('change', rerender);
 
@@ -152,19 +152,24 @@ function updateScreen() {
 
   const bottomLeftSquare = getSquare(screenBottomLeft);
   const topRightSquare = getSquare(screenTopRight);
+  const blocksToRender = [];
   for (let x = bottomLeftSquare.x; x<=topRightSquare.x; x++) {
     for (let y = bottomLeftSquare.y; y<=topRightSquare.y; y++) {
       if (!isRendered(x, y)) {
-        //renderBlock(x, y).catch(error => outputError(error));
-        try {
-          renderBlock(x, y);
-        } catch (error) {
-          outputError(error);
-        }
+        blocksToRender.push({x, y});
+        // renderBlock(x, y).catch(error => outputError(error));
+        // try {
+        //   renderBlock(x, y);
+        // } catch (error) {
+        //   outputError(error);
+        // }
       }
     }
   }
 
+  blocksToRender.forEach(block => {
+    renderBlock(block.x, block.y).catch(error => outputError(error));
+  });
 }
 
 function clearRenderedBlocks() {
@@ -193,11 +198,11 @@ function isRendered(x, y) {
   return renderedBlocks.some(block => block.x===x && block.y===y);
 }
 
-function renderBlock(x, y) {
+async function renderBlock(x, y) {
   const block = { x, y }
   renderedBlocks.push(block);
 
-  userFunction.renderer.getImage(x * imageWidth, y * imageHeight)
+  return userFunction.renderer.getImage(x * imageWidth, y * imageHeight)
     .then(blob => {
       //Block has been marked 'dead' in clearRenderedBlocks(), which means that
       //it got deleted while it was rendering. We can't stop render, so the
@@ -223,8 +228,8 @@ function renderBlock(x, y) {
       content.append(img);
       block.object = img;
       block.objectURL = objectURL;
-    })
-    .catch(outputError);
+    });
+    // .catch(outputError);
 }
 
 //See sketch 1
@@ -252,5 +257,24 @@ function renderBlock(x, y) {
   }
 }
 */
-
+/*
+displayMessage({
+  icon: 'info',
+  text: 'aiusdhaiu hsaiduhaskjdh aisduhasdkajs bdasioudhas',
+  title: 'Test message'
+});
+displayMessage({
+  icon: 'error',
+  text: 'eauoid auiedh iuahediu ahskdj haksdjasuda ksudha ',
+  title: 'Error'
+});
+displayMessage({
+  icon: 'warning',
+  text: 'iaejdoaeui ajeadhiau haieudhaie uhdaieud haksjdh eiauhda ujhae',
+  title: 'Warning',
+  options: {
+    cancel: {name: 'Cancel', handler: e => console.log('works')}
+  }
+});
+*/
 rerender();

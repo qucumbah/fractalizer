@@ -60,3 +60,58 @@ export function outputError(error) {
 
   throw error;
 }
+
+const messageContainer = $('.messages');
+
+export function displayMessage({ icon, text, title, options }) {
+  const messageDom = $('<div>', { class: 'message' });
+
+  const iconDom = $('<img>', {
+    class: 'icon',
+    draggable: 'false',
+    src: '/img/messageIcons/' + icon + '.png'
+  });
+  const iconContainerDom = $('<div>', { class: 'iconContainer' });
+  const textContainerDom = $('<div>', { class: 'textContainer' });
+  const titleDom = $('<h3>', { class: 'title' }).text(title);
+  const textDom = $('<p>', { class: 'text' }).text(text);
+
+  const optionsContainerDom = $('<div>', { class: 'optionsContainer' });
+  const removeThisMessage = () => messageDom.remove();
+  addOption({ name: 'Ok' }, optionsContainerDom, removeThisMessage);
+  if (options) {
+    for (const id in options) {
+      addOption(options[id], optionsContainerDom, removeThisMessage)
+    }
+  }
+
+  const closeButtonDom = $('<div>', {
+    class: 'closeButton',
+    click: removeThisMessage
+  });
+
+  iconContainerDom.append(iconDom);
+  textContainerDom.append(
+    titleDom,
+    textDom,
+    optionsContainerDom
+  );
+
+  messageDom.append(
+    iconContainerDom,
+    textContainerDom,
+    closeButtonDom
+  );
+  messageContainer.append(messageDom);
+}
+
+function addOption(option, container, removeHandler) {
+  const optionDom = $('<div>', {
+    class: 'option',
+    text: option.name,
+    click: option.handler
+  });
+  optionDom.click(removeHandler);
+
+  container.append(optionDom);
+}
