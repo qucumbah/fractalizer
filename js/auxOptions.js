@@ -2,9 +2,21 @@ import EventEmitter from './EventEmitter.js';
 import Slider from './Slider.js';
 import ScaleSlider from './ScaleSlider.js';
 import modal from './modal.js';
+import {outputError} from './util.js';
+import {getGLSLFromExpression} from './expressionParser.js';
 
 const content = $('.content');
 const container = $('.container');
+
+const DEFAULT_CODE_BODY = `
+vec2 fun(vec2 c) {
+  vec2 temp1 = powComplex(c, vec2(10, 0));
+  vec2 temp2 = sub(temp1, c);
+  vec2 temp3 = mul(temp2, vec2(10, 0));
+  return temp3;
+}
+`;
+const DEFAULT_EXPRESSION_BODY = '(c^10 - c)*10';
 
 class AuxOptions extends EventEmitter {
   constructor() {
@@ -19,6 +31,10 @@ class AuxOptions extends EventEmitter {
       y: container.height() / 2,
     };
     this.contentPosition = this.viewportCenter;
+    this.body = DEFAULT_CODE_BODY;
+    this.expressionBody = DEFAULT_EXPRESSION_BODY;
+    this.codeBody = DEFAULT_CODE_BODY;
+    this.mode = 'expression';
   }
 
   update({
@@ -28,7 +44,11 @@ class AuxOptions extends EventEmitter {
     saturationRange,
     valueRange,
     viewportCenter,
-    contentPosition
+    contentPosition,
+    body,
+    expressionBody,
+    codeBody,
+    mode
   }) {
     //console.log(this);
     this.fastMode = (fastMode!==undefined)?fastMode:this.fastMode;
@@ -41,6 +61,10 @@ class AuxOptions extends EventEmitter {
         (valueRange!==undefined)?valueRange:this.valueRange;
     this.viewportCenter = viewportCenter?viewportCenter:this.viewportCenter;
     this.contentPosition = contentPosition?contentPosition:this.contentPosition;
+    this.body = body?body:this.body;
+    this.expressionBody = expressionBody?expressionBody:this.expressionBody;
+    this.codeBody = codeBody?codeBody:this.codeBody;
+    this.mode = mode?mode:this.mode;
 
     this._emit('change', this);
   }
@@ -48,7 +72,6 @@ class AuxOptions extends EventEmitter {
 
 const auxOptions = new AuxOptions();
 
-const runButtons = $('.runButton');
 const fastModeCheckbox = $('.fastModeCheckbox');
 /*
 const scaleSlider = $('#scaleSlider');
@@ -134,13 +157,6 @@ function setActualScale() {
     initialScale = 0;
   }
 }
-
-runButtons.on('click', event => {
-  initialScale = 0;
-  if (!auxOptions.fastMode) {
-    auxOptions.update({ contentScaleFactor: 1 });
-  }
-});
 
 scaleSlider.on('input', event => {
   setFakeScale( scaleSlider.actualVal() );
@@ -245,5 +261,60 @@ function setContentPosition(x, y) {
   };
   auxOptions.update({ contentPosition });
 }
+
+const panel = $('.panel');
+const expression = $('.expression');
+const code = $('.code');
+
+const expressionButton = $('.expressionButton');
+const codeButton = $('.codeButton');
+expressionButton.click(()=>setMode('expression'));
+codeButton.click(()=>setMode('code'));
+
+function setMode(newMode) {
+  auxOptions.mode = newMode;
+  const className = 'panel --' + auxOptions.mode + 'Mode';
+  panel.attr('class', className)
+}
+
+$('.codeRunButton').click(function() {
+  const body = $('.code').get(0).value;
+
+  auxOptions.update({
+    body,
+    codeBody: body,
+    contentScaleFactor: 1
+  });
+});
+
+$('.expressionRunButton').click(function() {
+  const currentExpression = $('.expression').get(0).value;
+
+  try {
+    const body = getGLSLFromExpression(currentExpression);
+    auxOptions.update({
+      body,
+      expressionBody: currentExpression,
+      contentScaleFactor: 1
+    });
+  } catch (error) {
+    outputError(error);
+  }
+});
+$('.expressionCopyCodeButton').click(function() {
+  const currentExpression = $('.expression').get(0).value;
+  const currentFunctionBody = getGLSLFromExpression(currentExpression);
+
+  navigator.clipboard.writeText(currentFunctionBody);
+});
+
+auxOptions.on('change', event => {
+  // console.log('should be', event.expressionBody);
+  expression.val(event.expressionBody);
+  code.text(event.codeBody);
+});
+
+expression.text(DEFAULT_EXPRESSION_BODY);
+code.text(DEFAULT_CODE_BODY);
 
 export default auxOptions;

@@ -1,17 +1,7 @@
-import {getGLSLFromExpression} from './expressionParser.js';
-import {throttle, outputError} from './util.js';
+import {throttle} from './util.js';
 import FractalRenderer from './FractalRenderer.js';
 import EventEmitter from './EventEmitter.js';
 import auxOptions from './auxOptions.js';
-
-const DEFAULT_FUNCTION_BODY = `
-vec2 fun(vec2 c) {
-  vec2 temp1 = powComplex(c, vec2(10, 0));
-  vec2 temp2 = sub(temp1, c);
-  vec2 temp3 = mul(temp2, vec2(10, 0));
-  return temp3;
-}
-`;
 
 // const DEFAULT_FUNCTION_BODY = `
 // vec2 fun(vec2 c) {
@@ -23,7 +13,7 @@ class UserFunction extends EventEmitter {
   constructor() {
     super();
     this.options = {
-      body: DEFAULT_FUNCTION_BODY,
+      body: auxOptions.body,
       scale: auxOptions.scale,
       saturationRange: auxOptions.saturationRange,
       valueRange: auxOptions.valueRange,
@@ -46,6 +36,8 @@ class UserFunction extends EventEmitter {
       saturationRange,
       valueRange
   }) {
+    const bodyChanged = body !== this.options.body;
+
     this.options.body = body?body:this.options.body;
     this.options.fastMode =
       (fastMode!==undefined)?fastMode:this.options.fastMode;
@@ -55,7 +47,7 @@ class UserFunction extends EventEmitter {
     this.options.valueRange =
         (valueRange!==undefined)?valueRange:this.options.valueRange;
 
-    if (this.options.fastMode || body) {
+    if (bodyChanged) {
       this._update();
     }
   }
@@ -71,48 +63,6 @@ class UserFunction extends EventEmitter {
 const userFunction = new UserFunction();
 
 auxOptions.on('change', options => userFunction.changeOptions(options));
-
-const panel = $('.panel');
-const expression = $('.expression');
-const code = $('.code');
-
-let mode = 'expression';
-const expressionButton = $('.expressionButton');
-const codeButton = $('.codeButton');
-expressionButton.click(()=>setMode('expression'));
-codeButton.click(()=>setMode('code'));
-
-function setMode(newMode) {
-  mode = newMode;
-  const className = 'panel --' + mode + 'Mode';
-  panel.attr('class', className)
-}
-
-$('.codeRunButton').click(function() {
-  const body = $('.code').get(0).value;
-
-  userFunction.changeOptions({ body });
-});
-
-$('.expressionRunButton').click(function() {
-  const currentExpression = $('.expression').get(0).value;
-  try {
-    const body = getGLSLFromExpression(currentExpression);
-    userFunction.changeOptions({ body });
-  } catch (error) {
-    outputError(error);
-  }
-});
-$('.expressionCopyCodeButton').click(function() {
-  const currentExpression = $('.expression').get(0).value;
-  const currentFunctionBody = getGLSLFromExpression(currentExpression);
-
-  navigator.clipboard.writeText(currentFunctionBody);
-});
-/*
-const arr = userFunction.renderer.getValueAt(3, 0);
-console.log(arr);
-*/
 
 const displayFunctionValue = throttle(
   function(inputX, inputY, resultX, resultY) {
@@ -142,7 +92,7 @@ container.on('mousemove touchmove', event => {
     x = event.clientX;
     y = event.clientY;
   }
-  
+
   let inputX = (-contentPosition.x + x) / auxOptions.scale;
   let inputY = (
     (-contentPosition.y + (container.height() - y)) / auxOptions.scale
@@ -152,9 +102,5 @@ container.on('mousemove touchmove', event => {
 
   displayFunctionValue(inputX, inputY, arr.x, arr.y);
 });
-
-code.text(DEFAULT_FUNCTION_BODY);
-const DEFAULT_EXPRESSION_BODY = '(c^10 - c)*10';
-expression.text(DEFAULT_EXPRESSION_BODY);
 
 export default userFunction;

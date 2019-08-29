@@ -13,6 +13,7 @@ const FILES = [
   '/js/FractalRenderer.js',
   '/js/glsl/fragmentShaderSource.js',
   '/js/glsl/vertexShaderSource.js',
+  '/js/historyHandler.js',
   '/js/jquery-3.4.1.min.js',
   '/js/main.js',
   '/js/messageSystem.js',
@@ -97,7 +98,7 @@ self.addEventListener('fetch', function(event) {
       //
       //   return result;
       // })
-      
+
       .then(response => {
         //Found file in cache
         if (response) {

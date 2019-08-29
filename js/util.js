@@ -25,6 +25,17 @@ export function throttle(inner, ms) {
   }
 }
 
+//Waits for some time before calling the inner function; if the function is
+//called before the previous call could be compeleted, the new one replaces the
+//old one and resets the timer
+export function wait(inner, ms) {
+  let currentTimeout = null;
+  return function(...args) {
+    clearTimeout(currentTimeout);
+    currentTimeout = setTimeout(() => inner.apply(this, args), ms);
+  }
+}
+
 //arr = Uint8Array(8), contains encoded function value at some point
 //For details see fragmentShaderSource encode(). There are two sets of ints
 //(real and imaginary parts) that follow this structure:
