@@ -132,8 +132,7 @@ const displayFunctionValue = throttle(
 const container = $('.container');
 const content = $('.content');
 container.on('mousemove touchmove', event => {
-  const contentCurrentX = parseInt(content.css('left'));
-  const contentCurrentY = parseInt(content.css('bottom'));
+  const contentPosition = auxOptions.contentPosition;
 
   let x, y;
   if (event.type === 'touchmove') {
@@ -143,9 +142,11 @@ container.on('mousemove touchmove', event => {
     x = event.clientX;
     y = event.clientY;
   }
-
-  let inputX = (-contentCurrentX + x) / auxOptions.scale;
-  let inputY = (-contentCurrentY + (container.height() - y)) / auxOptions.scale;
+  
+  let inputX = (-contentPosition.x + x) / auxOptions.scale;
+  let inputY = (
+    (-contentPosition.y + (container.height() - y)) / auxOptions.scale
+  );
 
   const arr = userFunction.valueCalculator.getValueAt(inputX, inputY);
 

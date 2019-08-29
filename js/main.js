@@ -1,15 +1,50 @@
 import userFunction from './userFunction.js';
 import auxOptions from './auxOptions.js';
-import {outputError, clearErrorOutput, displayMessage} from './util.js';
+import {outputError, clearErrorOutput, displayMessage, throttle} from './util.js';
 
 userFunction.on('change', rerender);
+auxOptions.on('change', updateContentPosition);
 
 const container = $('.container');
 const content = $('.content');
-//Center on start
-//content.css('left', (container.width() - $('.panel').width()) / 2);
-content.css('left', container.width() / 2);
-content.css('bottom', container.height() / 2);
+
+// let currentDragTimer;
+function updateContentPosition() {
+  // console.log('update');
+  content.css('left', auxOptions.contentPosition.x);
+  content.css('bottom', auxOptions.contentPosition.y);
+  //Drag animation will be done later, right now focus is on other features
+  //Standart css transiton and jquery animations cause stutter, so I'll have to
+  //write my own implementation, for which I dont have time right now
+  /*
+  const DURATION = 2000;
+  const FRAME_LENGTH = 1000/60; //60 fps
+  const newPosition = auxOptions.contentPosition;
+  const oldPosition = {
+    x: parseFloat( content.css('left') ),
+    y: parseFloat( content.css('bottom') )
+  }
+  const movePerFrame = {
+    x: (newPosition.x - oldPosition.x) / DURATION * FRAME_LENGTH,
+    y: (newPosition.y - oldPosition.y) / DURATION * FRAME_LENGTH
+  }
+
+  function moveTowardsTarget() {
+    console.log('moving');
+    content.css({
+      left: '+=' + movePerFrame.x,
+      bottom: '+=' + movePerFrame.y
+    });
+  }
+
+  moveTowardsTarget();
+  if (currentDragTimer) {
+    clearTimeout(currentDragTimer);
+  }
+  currentDragTimer = setTimeout(moveTowardsTarget, FRAME_LENGTH);
+  */
+}
+updateContentPosition();
 
 container.on('mousedown touchstart', startDrag);
 container.on('mouseup touchend touchcancel', stopDrag);
@@ -32,16 +67,7 @@ container.on('wheel', function(event) {
 let isDragging;
 let dragStartX;
 let dragStartY;
-let contentStartX;
-let contentStartY;
-let contentCurrentX;
-let contentCurrentY;
-
-function updateContentCurrentPosition() {
-  contentCurrentX = parseInt(content.css('left'));
-  contentCurrentY = parseInt(content.css('bottom'));
-}
-updateContentCurrentPosition();
+let contentStart; //Position of content on start of drag
 
 function drag(event) {
   let changeX, changeY;
@@ -55,11 +81,18 @@ function drag(event) {
   }
 
   if (isDragging) {
-    contentCurrentX = contentStartX + changeX;
-    contentCurrentY = contentStartY - changeY;
+    // contentCurrentX = contentStartX + changeX;
+    // contentCurrentY = contentStartY - changeY;
+    //
+    // content.css('left', contentCurrentX);
+    // content.css('bottom', contentCurrentY);
 
-    content.css('left', contentCurrentX);
-    content.css('bottom', contentCurrentY);
+    const contentPosition = {
+      x: contentStart.x + changeX,
+      y: contentStart.y - changeY
+    };
+
+    auxOptions.update({ contentPosition });
 
     updateScreen();
   }
@@ -83,8 +116,10 @@ function resetDragStart(event) {
     dragStartY = event.clientY;
   }
 
-  contentStartX = parseInt(content.css('left'));
-  contentStartY = parseInt(content.css('bottom'));
+  contentStart = auxOptions.contentPosition;
+
+  // contentStartX = parseInt(content.css('left'));
+  // contentStartY = parseInt(content.css('bottom'));
 }
 
 /*
@@ -109,7 +144,6 @@ function updateFunctionValue(event) {
 function rerender() {
   content.css('transform', 'scale(1)');
 
-  updateContentCurrentPosition();
   clearRenderedBlocks();
   clearErrorOutput();
   updateScreen();
@@ -136,8 +170,8 @@ function updateScreen() {
 
   const scale = auxOptions.contentScaleFactor;
   const distanceToCenter = {
-    x: ( screenWidth/2 - contentCurrentX ) / scale,
-    y: ( screenHeight/2 - contentCurrentY ) / scale
+    x: ( screenWidth/2 - auxOptions.contentPosition.x ) / scale,
+    y: ( screenHeight/2 - auxOptions.contentPosition.y ) / scale
   };
 
   const screenBottomLeft = {

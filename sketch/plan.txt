@@ -19,8 +19,8 @@ TODOS:
 14) Loader - not needed, loading is too fast X
 15) Add scale buttons V
 16) Change scale units in sliders V
-17) Smooth animations
-18) Rewrite content position
+17) Smooth animations - postponed X
+18) Rewrite content position V
 
 Fractalibrary
 c^{-1;-1} - whirlwind

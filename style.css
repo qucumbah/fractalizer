@@ -186,6 +186,8 @@ body {
   width: 0;
   height: 0;
   position: absolute;
+  /* smooth scrolling; looks bad now because movement is not smooth */
+  /* transition: transform .2s; */
 }
 
 .content .block {

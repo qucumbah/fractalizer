@@ -3,6 +3,9 @@ import Slider from './Slider.js';
 import ScaleSlider from './ScaleSlider.js';
 import modal from './modal.js';
 
+const content = $('.content');
+const container = $('.container');
+
 class AuxOptions extends EventEmitter {
   constructor() {
     super();
@@ -11,6 +14,11 @@ class AuxOptions extends EventEmitter {
     this.contentScaleFactor = 1;
     this.saturationRange = 0.5;
     this.valueRange = 0;
+    this.viewportCenter = {
+      x: container.width() / 2,
+      y: container.height() / 2,
+    };
+    this.contentPosition = this.viewportCenter;
   }
 
   update({
@@ -18,7 +26,9 @@ class AuxOptions extends EventEmitter {
     scale,
     contentScaleFactor,
     saturationRange,
-    valueRange
+    valueRange,
+    viewportCenter,
+    contentPosition
   }) {
     //console.log(this);
     this.fastMode = (fastMode!==undefined)?fastMode:this.fastMode;
@@ -29,6 +39,8 @@ class AuxOptions extends EventEmitter {
         (saturationRange!==undefined)?saturationRange:this.saturationRange;
     this.valueRange =
         (valueRange!==undefined)?valueRange:this.valueRange;
+    this.viewportCenter = viewportCenter?viewportCenter:this.viewportCenter;
+    this.contentPosition = contentPosition?contentPosition:this.contentPosition;
 
     this._emit('change', this);
   }
@@ -36,8 +48,6 @@ class AuxOptions extends EventEmitter {
 
 const auxOptions = new AuxOptions();
 
-const content = $('.content');
-const container = $('.container');
 const runButtons = $('.runButton');
 const fastModeCheckbox = $('.fastModeCheckbox');
 /*
@@ -98,27 +108,23 @@ function setFakeScale(amount, mouseOffset) {
 
   //Center of scaling should stay in place
   const centerOfScalingOffset = mouseOffset?mouseOffset:{
-    bottom: container.height() / 2,
-    left: container.width() / 2
+    x: container.width() / 2,
+    y: container.height() / 2
   };
-  const contentOffset = {
-    bottom: parseFloat(content.css('bottom')),
-    left: parseFloat(content.css('left'))
-  };
+  const contentOffset = auxOptions.contentPosition;
 
   const f = newScaleFactor / oldScaleFactor;
-  const changeBottom =
-      (contentOffset.bottom - centerOfScalingOffset.bottom) * (f-1);
-  const changeLeft =
-      (contentOffset.left - centerOfScalingOffset.left) * (f-1);
+  const changeX = (contentOffset.x - centerOfScalingOffset.x) * (f-1);
+  const changeY = (contentOffset.y - centerOfScalingOffset.y) * (f-1);
 
   //change = (content - centerOfScaling) * newScaleFactor / oldScaleFactor;
   //console.log(f, centerOfScalingOffset, contentOffset, changeBottom, changeLeft);
-  content.css({
-    bottom: contentOffset.bottom + changeBottom,
-    left: contentOffset.left + changeLeft,
-    transform: 'scale(' + newScaleFactor + ')'
-  });
+  const contentPosition = {
+    x: contentOffset.x + changeX,
+    y: contentOffset.y + changeY
+  };
+  auxOptions.update({ contentPosition });
+  content.css('transform', 'scale(' + newScaleFactor + ')');
   //console.log(content.css());
 }
 
@@ -161,8 +167,8 @@ $('.container').on('wheel', event => {
   const amount = event.originalEvent.deltaY;
 
   const mouseOffset = {
-    bottom: container.height() - event.offsetY,
-    left: event.offsetX
+    y: container.height() - event.offsetY,
+    x: event.offsetX
   }
 
   if (amount>0) {
@@ -233,8 +239,11 @@ function showNavigateModal() {
 }
 
 function setContentPosition(x, y) {
-  content.css('left', x * -auxOptions.scale);
-  content.css('bottom', y * -auxOptions.scale);
+  const contentPosition = {
+    x: x * -auxOptions.scale,
+    y: y * -auxOptions.scale
+  };
+  auxOptions.update({ contentPosition });
 }
 
 export default auxOptions;
