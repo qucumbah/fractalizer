@@ -1,6 +1,6 @@
 import userFunction from './userFunction.js';
 import auxOptions from './auxOptions.js';
-import {outputError, clearErrorOutput, displayMessage, throttle} from './util.js';
+import {outputError, clearErrorOutput, displayMessage} from './util.js';
 
 userFunction.on('change', rerender);
 auxOptions.on('change', updateContentPosition);

@@ -5,7 +5,7 @@ TODOS:
 	3. Closeable panel
 	4. Settings
 2) Touch support
-3) Service worker P
+3) Service worker V
 4) Library of fractals
 5) History api
 6) Additional info
