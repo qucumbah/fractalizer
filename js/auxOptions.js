@@ -48,7 +48,8 @@ class AuxOptions extends EventEmitter {
     body,
     expressionBody,
     codeBody,
-    mode
+    mode,
+    rerender
   }) {
     //console.log(this);
     this.fastMode = (fastMode!==undefined)?fastMode:this.fastMode;
@@ -65,6 +66,7 @@ class AuxOptions extends EventEmitter {
     this.expressionBody = expressionBody?expressionBody:this.expressionBody;
     this.codeBody = codeBody?codeBody:this.codeBody;
     this.mode = mode?mode:this.mode;
+    this.rerender = (rerender!==undefined)?rerender:this.rerender;
 
     this._emit('change', this);
   }
@@ -117,17 +119,13 @@ function setFakeScale(amount, mouseOffset) {
     return;
   }
 
-  if (!initialScale) {
-    initialScale = auxOptions.scale;
-  }
+  console.log(fakeScale);
 
   const oldScaleFactor = fakeScale / initialScale;
   fakeScale = amount;
   const newScaleFactor = fakeScale / initialScale;
 
-  if (!auxOptions.fastMode) {
-    auxOptions.update({ contentScaleFactor: newScaleFactor });
-  }
+  auxOptions.update({ contentScaleFactor: newScaleFactor });
 
   //Center of scaling should stay in place
   const centerOfScalingOffset = mouseOffset?mouseOffset:{
@@ -140,22 +138,16 @@ function setFakeScale(amount, mouseOffset) {
   const changeX = (contentOffset.x - centerOfScalingOffset.x) * (f-1);
   const changeY = (contentOffset.y - centerOfScalingOffset.y) * (f-1);
 
-  //change = (content - centerOfScaling) * newScaleFactor / oldScaleFactor;
-  //console.log(f, centerOfScalingOffset, contentOffset, changeBottom, changeLeft);
   const contentPosition = {
     x: contentOffset.x + changeX,
     y: contentOffset.y + changeY
   };
   auxOptions.update({ contentPosition });
   content.css('transform', 'scale(' + newScaleFactor + ')');
-  //console.log(content.css());
 }
 
 function setActualScale() {
   auxOptions.update({ scale: fakeScale });
-  if (auxOptions.fastMode) {
-    initialScale = 0;
-  }
 }
 
 scaleSlider.on('input', event => {
@@ -283,8 +275,11 @@ $('.codeRunButton').click(function() {
   auxOptions.update({
     body,
     codeBody: body,
-    contentScaleFactor: 1
+    contentScaleFactor: 1,
+    rerender: true
   });
+
+  fakeScale = initialScale;
 });
 
 $('.expressionRunButton').click(function() {
@@ -295,8 +290,11 @@ $('.expressionRunButton').click(function() {
     auxOptions.update({
       body,
       expressionBody: currentExpression,
-      contentScaleFactor: 1
+      contentScaleFactor: 1,
+      rerender: true
     });
+
+    fakeScale = initialScale;
   } catch (error) {
     outputError(error);
   }
@@ -312,6 +310,9 @@ auxOptions.on('change', event => {
   // console.log('should be', event.expressionBody);
   expression.val(event.expressionBody);
   code.text(event.codeBody);
+  // scaleSlider.val(event.scale);
+  // saturationRangeSlider.val(event.saturationRange);
+  // valueRangeSlider.val(event.valueRange);
 });
 
 expression.text(DEFAULT_EXPRESSION_BODY);

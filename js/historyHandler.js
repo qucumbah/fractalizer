@@ -2,8 +2,6 @@ import auxOptions from './auxOptions.js';
 import userFunction from './userFunction.js';
 import {wait} from './util.js';
 
-console.log(userFunction);
-
 let lastSavedState = {};
 window.addEventListener('popstate', event => {
   if (event.state === null) {

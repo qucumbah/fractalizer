@@ -3,7 +3,10 @@ import auxOptions from './auxOptions.js';
 import {outputError, clearErrorOutput, displayMessage} from './util.js';
 
 userFunction.on('change', rerender);
-auxOptions.on('change', updateContentPosition);
+auxOptions.on('change', () => {
+  updateContentPosition();
+  updateScreen();
+});
 
 const container = $('.container');
 const content = $('.content');
