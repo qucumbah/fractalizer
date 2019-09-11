@@ -35,36 +35,15 @@ class AuxOptions extends EventEmitter {
     this.expressionBody = DEFAULT_EXPRESSION_BODY;
     this.codeBody = DEFAULT_CODE_BODY;
     this.mode = 'expression';
+    this.rerender = false;
   }
 
-  update({
-    fastMode,
-    scale,
-    contentScaleFactor,
-    saturationRange,
-    valueRange,
-    viewportCenter,
-    contentPosition,
-    body,
-    expressionBody,
-    codeBody,
-    mode
-  }) {
-    //console.log(this);
-    this.fastMode = (fastMode!==undefined)?fastMode:this.fastMode;
-    this.scale = scale?scale:this.scale;
-    this.contentScaleFactor =
-        (contentScaleFactor!==undefined)?contentScaleFactor:this.contentScaleFactor;
-    this.saturationRange =
-        (saturationRange!==undefined)?saturationRange:this.saturationRange;
-    this.valueRange =
-        (valueRange!==undefined)?valueRange:this.valueRange;
-    this.viewportCenter = viewportCenter?viewportCenter:this.viewportCenter;
-    this.contentPosition = contentPosition?contentPosition:this.contentPosition;
-    this.body = body?body:this.body;
-    this.expressionBody = expressionBody?expressionBody:this.expressionBody;
-    this.codeBody = codeBody?codeBody:this.codeBody;
-    this.mode = mode?mode:this.mode;
+  update(newOptions) {
+    for (let key in newOptions) {
+      if (newOptions[key] !== undefined) {
+        this[key] = newOptions[key];
+      }
+    }
 
     this._emit('change', this);
   }
@@ -113,7 +92,8 @@ let fakeScale = auxOptions.scale;
 let initialScale = auxOptions.scale;
 
 function setFakeScale(amount, mouseOffset) {
-  if (amount <= 0) {
+  console.log(amount, fakeScale, auxOptions);
+  if (amount <= 1) {
     return;
   }
 
@@ -125,9 +105,7 @@ function setFakeScale(amount, mouseOffset) {
   fakeScale = amount;
   const newScaleFactor = fakeScale / initialScale;
 
-  if (!auxOptions.fastMode) {
-    auxOptions.update({ contentScaleFactor: newScaleFactor });
-  }
+  auxOptions.update({ contentScaleFactor: newScaleFactor });
 
   //Center of scaling should stay in place
   const centerOfScalingOffset = mouseOffset?mouseOffset:{
@@ -140,43 +118,27 @@ function setFakeScale(amount, mouseOffset) {
   const changeX = (contentOffset.x - centerOfScalingOffset.x) * (f-1);
   const changeY = (contentOffset.y - centerOfScalingOffset.y) * (f-1);
 
-  //change = (content - centerOfScaling) * newScaleFactor / oldScaleFactor;
-  //console.log(f, centerOfScalingOffset, contentOffset, changeBottom, changeLeft);
   const contentPosition = {
     x: contentOffset.x + changeX,
     y: contentOffset.y + changeY
   };
   auxOptions.update({ contentPosition });
   content.css('transform', 'scale(' + newScaleFactor + ')');
-  //console.log(content.css());
-}
-
-function setActualScale() {
-  auxOptions.update({ scale: fakeScale });
-  if (auxOptions.fastMode) {
-    initialScale = 0;
-  }
 }
 
 scaleSlider.on('input', event => {
   setFakeScale( scaleSlider.actualVal() );
 });
 scaleSlider.on('change', event => {
-  setActualScale();
+  auxOptions.update({ scale: fakeScale });
 });
 
 const DEFAULT_AMOUNT = 1.1;
 function zoomIn(mouseOffset) {
   setFakeScale(fakeScale * DEFAULT_AMOUNT, mouseOffset);
-
-  scaleSlider.val(fakeScale);
-  setActualScale();
 }
 function zoomOut(mouseOffset) {
   setFakeScale(fakeScale / DEFAULT_AMOUNT, mouseOffset);
-
-  scaleSlider.val(fakeScale);
-  setActualScale();
 }
 
 $('.container').on('wheel', event => {
@@ -283,8 +245,12 @@ $('.codeRunButton').click(function() {
   auxOptions.update({
     body,
     codeBody: body,
-    contentScaleFactor: 1
+    contentScaleFactor: 1,
+    scale: fakeScale,
+    rerender: true
   });
+
+  initialScale = 0;
 });
 
 $('.expressionRunButton').click(function() {
@@ -295,8 +261,12 @@ $('.expressionRunButton').click(function() {
     auxOptions.update({
       body,
       expressionBody: currentExpression,
-      contentScaleFactor: 1
+      contentScaleFactor: 1,
+      scale: fakeScale,
+      rerender: true
     });
+
+    initialScale = 0;
   } catch (error) {
     outputError(error);
   }
@@ -312,6 +282,9 @@ auxOptions.on('change', event => {
   // console.log('should be', event.expressionBody);
   expression.val(event.expressionBody);
   code.text(event.codeBody);
+  // scaleSlider.val(event.scale);
+  // saturationRangeSlider.val(event.saturationRange);
+  // valueRangeSlider.val(event.valueRange);
 });
 
 expression.text(DEFAULT_EXPRESSION_BODY);

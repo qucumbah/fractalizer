@@ -3,12 +3,6 @@ import FractalRenderer from './FractalRenderer.js';
 import EventEmitter from './EventEmitter.js';
 import auxOptions from './auxOptions.js';
 
-// const DEFAULT_FUNCTION_BODY = `
-// vec2 fun(vec2 c) {
-//   return c;
-// }
-// `;
-
 class UserFunction extends EventEmitter {
   constructor() {
     super();
@@ -29,25 +23,14 @@ class UserFunction extends EventEmitter {
     this._update();
   }
 
-  changeOptions({
-      body,
-      fastMode,
-      scale,
-      saturationRange,
-      valueRange
-  }) {
-    const bodyChanged = body !== this.options.body;
+  changeOptions(newOptions) {
+    for (let key in newOptions) {
+      if (newOptions[key] !== undefined) {
+        this.options[key] = newOptions[key];
+      }
+    }
 
-    this.options.body = body?body:this.options.body;
-    this.options.fastMode =
-      (fastMode!==undefined)?fastMode:this.options.fastMode;
-    this.options.scale = (scale!==undefined)?scale:this.options.scale;
-    this.options.saturationRange =
-        (saturationRange!==undefined)?saturationRange:this.options.saturationRange;
-    this.options.valueRange =
-        (valueRange!==undefined)?valueRange:this.options.valueRange;
-
-    if (bodyChanged) {
+    if (newOptions.body !== undefined) {
       this._update();
     }
   }
@@ -62,7 +45,12 @@ class UserFunction extends EventEmitter {
 
 const userFunction = new UserFunction();
 
-auxOptions.on('change', options => userFunction.changeOptions(options));
+auxOptions.on('change', options => {
+  if (options.rerender) {
+    userFunction.changeOptions(options);
+    auxOptions.update({ rerender: false });
+  }
+});
 
 const displayFunctionValue = throttle(
   function(inputX, inputY, resultX, resultY) {
