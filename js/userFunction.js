@@ -23,7 +23,6 @@ class UserFunction extends EventEmitter {
     this._update();
   }
 
-<<<<<<< HEAD
   changeOptions(newOptions) {
     for (let key in newOptions) {
       if (newOptions[key] !== undefined) {
@@ -32,25 +31,6 @@ class UserFunction extends EventEmitter {
     }
 
     if (newOptions.body !== undefined) {
-=======
-  changeOptions({
-      body,
-      fastMode,
-      scale,
-      saturationRange,
-      valueRange
-  }) {
-    this.options.body = body?body:this.options.body;
-    this.options.fastMode =
-      (fastMode!==undefined)?fastMode:this.options.fastMode;
-    this.options.scale = (scale!==undefined)?scale:this.options.scale;
-    this.options.saturationRange =
-        (saturationRange!==undefined)?saturationRange:this.options.saturationRange;
-    this.options.valueRange =
-        (valueRange!==undefined)?valueRange:this.options.valueRange;
-
-    if (body !== undefined) {
->>>>>>> 5011d1b018e34af39cb85285f945750ae81d91b5
       this._update();
     }
   }

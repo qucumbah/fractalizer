@@ -38,45 +38,12 @@ class AuxOptions extends EventEmitter {
     this.rerender = false;
   }
 
-<<<<<<< HEAD
   update(newOptions) {
     for (let key in newOptions) {
       if (newOptions[key] !== undefined) {
         this[key] = newOptions[key];
       }
     }
-=======
-  update({
-    fastMode,
-    scale,
-    contentScaleFactor,
-    saturationRange,
-    valueRange,
-    viewportCenter,
-    contentPosition,
-    body,
-    expressionBody,
-    codeBody,
-    mode,
-    rerender
-  }) {
-    //console.log(this);
-    this.fastMode = (fastMode!==undefined)?fastMode:this.fastMode;
-    this.scale = scale?scale:this.scale;
-    this.contentScaleFactor =
-        (contentScaleFactor!==undefined)?contentScaleFactor:this.contentScaleFactor;
-    this.saturationRange =
-        (saturationRange!==undefined)?saturationRange:this.saturationRange;
-    this.valueRange =
-        (valueRange!==undefined)?valueRange:this.valueRange;
-    this.viewportCenter = viewportCenter?viewportCenter:this.viewportCenter;
-    this.contentPosition = contentPosition?contentPosition:this.contentPosition;
-    this.body = body?body:this.body;
-    this.expressionBody = expressionBody?expressionBody:this.expressionBody;
-    this.codeBody = codeBody?codeBody:this.codeBody;
-    this.mode = mode?mode:this.mode;
-    this.rerender = (rerender!==undefined)?rerender:this.rerender;
->>>>>>> 5011d1b018e34af39cb85285f945750ae81d91b5
 
     this._emit('change', this);
   }
@@ -125,11 +92,14 @@ let fakeScale = auxOptions.scale;
 let initialScale = auxOptions.scale;
 
 function setFakeScale(amount, mouseOffset) {
+  console.log(amount, fakeScale, auxOptions);
   if (amount <= 1) {
     return;
   }
 
-  console.log(fakeScale);
+  if (!initialScale) {
+    initialScale = auxOptions.scale;
+  }
 
   const oldScaleFactor = fakeScale / initialScale;
   fakeScale = amount;
@@ -154,13 +124,6 @@ function setFakeScale(amount, mouseOffset) {
   };
   auxOptions.update({ contentPosition });
   content.css('transform', 'scale(' + newScaleFactor + ')');
-<<<<<<< HEAD
-=======
-}
-
-function setActualScale() {
-  auxOptions.update({ scale: fakeScale });
->>>>>>> 5011d1b018e34af39cb85285f945750ae81d91b5
 }
 
 scaleSlider.on('input', event => {
@@ -283,18 +246,11 @@ $('.codeRunButton').click(function() {
     body,
     codeBody: body,
     contentScaleFactor: 1,
-<<<<<<< HEAD
     scale: fakeScale,
     rerender: true
   });
 
   initialScale = 0;
-=======
-    rerender: true
-  });
-
-  fakeScale = initialScale;
->>>>>>> 5011d1b018e34af39cb85285f945750ae81d91b5
 });
 
 $('.expressionRunButton').click(function() {
@@ -306,18 +262,11 @@ $('.expressionRunButton').click(function() {
       body,
       expressionBody: currentExpression,
       contentScaleFactor: 1,
-<<<<<<< HEAD
       scale: fakeScale,
       rerender: true
     });
 
     initialScale = 0;
-=======
-      rerender: true
-    });
-
-    fakeScale = initialScale;
->>>>>>> 5011d1b018e34af39cb85285f945750ae81d91b5
   } catch (error) {
     outputError(error);
   }
