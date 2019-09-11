@@ -108,7 +108,6 @@ export default class Slider extends EventEmitter {
     if (newValue < this._lowerBound || newValue > this._upperBound) {
       //Invalid argument
       this._emit('_inputError');
-      return;
     }
 
     if (newValue <= this._min) {
@@ -144,7 +143,6 @@ export default class Slider extends EventEmitter {
     if (newValue < this._lowerBound || newValue > this._upperBound) {
       //Invalid argument
       this._emit('_inputError');
-      return;
     }
 
     if (newValue >= this._max) {
@@ -156,14 +154,12 @@ export default class Slider extends EventEmitter {
     }
 
     this._min = newValue;
-
     this._emit('_inputSuccess');
   }
   _setMax = newValue => {
     if (newValue < this._lowerBound || newValue > this._upperBound) {
       //Invalid argument
       this._emit('_inputError');
-      return;
     }
 
     if (newValue <= this._min) {
@@ -175,7 +171,6 @@ export default class Slider extends EventEmitter {
     }
 
     this._max = newValue;
-
     this._emit('_inputSuccess');
   }
 }
