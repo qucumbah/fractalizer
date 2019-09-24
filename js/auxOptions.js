@@ -51,7 +51,6 @@ class AuxOptions extends EventEmitter {
 
 const auxOptions = new AuxOptions();
 
-const fastModeCheckbox = $('.fastModeCheckbox');
 /*
 const scaleSlider = $('#scaleSlider');
 const saturationRangeSlider = $('#saturationRangeSlider');
@@ -83,16 +82,11 @@ const valueRangeSlider = new Slider({
   lowerBound: 0,
 });
 
-fastModeCheckbox.on('change', function(event) {
-  const fastMode = fastModeCheckbox.is(':checked');
-  auxOptions.update({ fastMode });
-});
-
 let fakeScale = auxOptions.scale;
 let initialScale = auxOptions.scale;
 
 function setFakeScale(amount, mouseOffset) {
-  console.log(amount, fakeScale, auxOptions);
+  console.log(amount);
   if (amount <= 1) {
     return;
   }
@@ -136,9 +130,13 @@ scaleSlider.on('change', event => {
 const DEFAULT_AMOUNT = 1.1;
 function zoomIn(mouseOffset) {
   setFakeScale(fakeScale * DEFAULT_AMOUNT, mouseOffset);
+
+  scaleSlider.val(fakeScale);
 }
 function zoomOut(mouseOffset) {
   setFakeScale(fakeScale / DEFAULT_AMOUNT, mouseOffset);
+
+  scaleSlider.val(fakeScale);
 }
 
 $('.container').on('wheel', event => {
@@ -161,6 +159,20 @@ const zoomOutButton = $('.zoomOutButton');
 
 zoomInButton.on('click', () => zoomIn());
 zoomOutButton.on('click', () => zoomOut());
+
+let pinchScaleStart;
+
+$('.container').on('_pinchstart', event => {
+  pinchScaleStart = fakeScale;
+});
+
+$('.container').on('_pinchchange', event => {
+  setFakeScale(event.scale * pinchScaleStart);
+});
+
+$('.container').on('_pinchend', event => {
+  scaleSlider.val(fakeScale);
+});
 
 saturationRangeSlider.on('change', function() {
   auxOptions.update({ saturationRange: saturationRangeSlider.val() });

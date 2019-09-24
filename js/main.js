@@ -49,23 +49,11 @@ function updateContentPosition() {
 }
 updateContentPosition();
 
-container.on('mousedown touchstart', startDrag);
-container.on('mouseup touchend touchcancel', stopDrag);
-container.on('mousemove touchmove', drag);
+container.on('_pointerdown', startDrag);
+container.on('_pointerup', stopDrag);
+container.on('_pointermove', drag);
 container.on('wheel', resetDragStart);
-/*
-container.on('wheel', function(event) {
-  const SCROLL_MULTIPLIER = 0.5;
 
-  const amount = event.originalEvent.deltaY;
-
-  if (amount>0) {
-    changeScale(SCROLL_MULTIPLIER);
-  } else {
-    changeScale(1 / SCROLL_MULTIPLIER);
-  }
-});
-*/
 //Globals are evil, and I'm a friend of the devil
 let isDragging;
 let dragStartX;
@@ -75,21 +63,10 @@ let contentStart; //Position of content on start of drag
 function drag(event) {
   let changeX, changeY;
 
-  if (event.type === 'touchmove') {
-    changeX = event.changedTouches[0].clientX - dragStartX;
-    changeY = event.changedTouches[0].clientY - dragStartY;
-  } else {
-    changeX = event.clientX - dragStartX;
-    changeY = event.clientY - dragStartY;
-  }
+  changeX = event.clientX - dragStartX;
+  changeY = event.clientY - dragStartY;
 
   if (isDragging) {
-    // contentCurrentX = contentStartX + changeX;
-    // contentCurrentY = contentStartY - changeY;
-    //
-    // content.css('left', contentCurrentX);
-    // content.css('bottom', contentCurrentY);
-
     const contentPosition = {
       x: contentStart.x + changeX,
       y: contentStart.y - changeY
@@ -111,39 +88,12 @@ function stopDrag() {
 
 //Need this to sync plane movement with drag after rescaling it
 function resetDragStart(event) {
-  if (event.type === 'touchstart') {
-    dragStartX = event.changedTouches[0].clientX;
-    dragStartY = event.changedTouches[0].clientY;
-  } else {
-    dragStartX = event.clientX;
-    dragStartY = event.clientY;
-  }
+  dragStartX = event.clientX;
+  dragStartY = event.clientY;
 
   contentStart = auxOptions.contentPosition;
-
-  // contentStartX = parseInt(content.css('left'));
-  // contentStartY = parseInt(content.css('bottom'));
 }
 
-/*
-function updateFunctionValue(event) {
-  let inputX = (-contentCurrentX+event.clientX)/scale;
-  let inputY = (-contentCurrentY+(container.height()-event.clientY))/scale;
-
-  const c = new Complex({x: inputX, y: inputY});
-  let {x: resultX, y: resultY} = userFunction.evaluate(Complex, c);
-
-  //Trim result
-  inputX = inputX.toFixed(2);
-  inputY = inputY.toFixed(2);
-  resultX = resultX.toFixed(2);
-  resultY = resultY.toFixed(2);
-
-  const output = `f(${inputX}, ${inputY}) = (${resultX}, ${resultY})`;
-
-  $('.functionValue').text(output);
-}
-*/
 function rerender() {
   content.css('transform', 'scale(1)');
 
@@ -158,19 +108,6 @@ const imageWidth = 100;
 const imageHeight = 100;
 let renderedBlocks = [];
 function updateScreen() {
-  /*
-  const screenBottomLeft = {
-    x: -contentCurrentX,
-    y: -contentCurrentY
-  };
-  const screenTopRight = {
-    x: -contentCurrentX + screenWidth,
-    y: -contentCurrentY + screenHeight
-  };
-
-  console.log(screenBottomLeft, screenTopRight);
-  */
-
   const scale = auxOptions.contentScaleFactor;
   const distanceToCenter = {
     x: ( screenWidth/2 - auxOptions.contentPosition.x ) / scale,
