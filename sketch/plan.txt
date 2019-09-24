@@ -1,9 +1,9 @@
 TODOS:
-1) New interface
-	1. Quick reload button
-	2. Theming
-	3. Closeable panel
-	4. Settings
+1) New interface P
+	1. Quick reload button P
+	2. Theming V
+	3. Closeable panel V
+	4. Settings - not needed X
 2) Touch support V
 3) Service worker V
 4) Library of fractals - postponed X

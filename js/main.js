@@ -207,6 +207,22 @@ async function renderBlock(x, y) {
     // .catch(outputError);
 }
 
+let panelOpen = false;
+const togglePanelButton = $('.togglePanelButton');
+const panel = $('.panel');
+
+togglePanelButton.on('click', function(event) {
+  panelOpen = !panelOpen;
+
+  if (panelOpen) {
+    togglePanelButton.text('<');
+    panel.css('left', '0px');
+  } else {
+    togglePanelButton.text('>');
+    panel.css('left', '-250px');
+  }
+});
+
 /*
 displayMessage({
   icon: 'info',

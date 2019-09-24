@@ -1,5 +1,7 @@
 const FILES = [
   '/',
+  '/img/BG.png',
+  '/img/BGcode.png',
   '/img/logo192.png',
   '/img/logo512.png',
   '/img/icons/close.svg',
@@ -18,6 +20,7 @@ const FILES = [
   '/js/main.js',
   '/js/messageSystem.js',
   '/js/modal.js',
+  '/js/pointerEvents.js',
   '/js/ScaleSlider.js',
   '/js/Slider.js',
   '/js/userFunction.js',

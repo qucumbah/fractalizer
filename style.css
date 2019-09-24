@@ -4,6 +4,22 @@ body {
   height: 100%;
   overflow: hidden;
   position: fixed;
+  background-color: #001224;
+  color: #eee;
+  font-family: 'Raleway', sans-serif;
+}
+
+button {
+  border-radius: 4px;
+  border: 0px;
+  cursor: pointer;
+  transition: .2s;
+  transition-property: background-color;
+  padding: 5px 10px;
+  font-weight: bold;
+}
+button:hover {
+  background-color: white;
 }
 
 /* Modal */
@@ -137,36 +153,39 @@ body {
   z-index: 2;
   display: inline-block;
   padding: 5px;
-  background-color: white;
-  border-radius: 0px 0px 10px 0px;
+  border-radius: 4px;
+  right: 10px;
+  top: 10px;
+  background-color: #001224;
+  box-shadow: 0px 0px 5px 0px rgba(0, 0, 0, 0.75);
 }
 
 .controlButtons {
   position: absolute;
   top: 100px;
+  right: 10px;
   z-index: 2;
   display: inline-block;
   padding: 2px;
-  background-color: rgba(255, 255, 255, 0.9);
+  /* background-color: rgba(255, 255, 255, 0.9); */
   border-radius: 0px 7px 7px 0px;
 }
 
 .controlButtons .button {
   width: 30px;
   height: 30px;
-  background-color: white;
-  border: 1px solid #ddd;
-  border-radius: 100px;
+  background-color: #001224;
+  border-radius: 4px;
   display: flex;
   justify-content: center;
   align-items: center;
   cursor: pointer;
   user-select: none;
-
-  margin-bottom: 5px;
+  box-shadow: 0px 0px 5px 0px rgba(0, 0, 0, 0.75);
+  margin-bottom: 3px;
 }
 .controlButtons .button:last-child {
-  margin-bottom: 0px;
+  margin-top: 20px;
 }
 
 /* Content & content container */
@@ -180,6 +199,7 @@ body {
   position: relative;
   overflow: hidden;
   border: 1px solid black;
+  background-color: #16355d;
 }
 
 .content {
@@ -203,16 +223,51 @@ body {
   height: 100%;
   width: 250px;
   top: 0;
-  right: 0;
+  left: 0;
   z-index: 3;
-  background-color: white;
   display: flex;
   align-items: center;
   justify-content: flex-start;
   flex-direction: column;
-  padding: 20px;
-  overflow-y: scroll;
+  padding: 13px;
   box-sizing: border-box;
+  box-shadow: 0px 0px 5px 0px rgba(0, 0, 0, 0.75);
+  transition: .4s ease;
+}
+.panel.--expressionMode {
+  background: url('/img/BG.png');
+  background-repeat: repeat;
+  background-position: center;
+  background-size: 130%;
+}
+.panel.--codeMode {
+  background: url('/img/BGcode.png');
+  background-repeat: repeat;
+  background-position: center;
+  background-size: 500%;
+}
+
+.panel .togglePanelButton {
+  width: 20px;
+  height: 40px;
+  position: absolute;
+  background-color: #001224;
+  cursor: pointer;
+  right: -20px;
+  border-radius: 0px 4px 4px 0px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  box-shadow: 0px 0px 5px 0px rgba(0, 0, 0, 0.75);
+}
+
+.panel .label {
+  font-weight: 600;
+  margin-top: 20px;
+  margin-bottom: 5px;
+}
+.panel .label:first-child {
+  margin-top: 0;
 }
 
 .options {
@@ -231,9 +286,13 @@ body {
 
 .sliderContainer {
   display: grid;
-  grid-template-rows: auto auto;
+  grid-template-rows: 20px 20px;
   grid-template-columns: 40px 1fr 40px;
+  grid-gap: 5px;
   margin-bottom: 20px;
+}
+.sliderContainer:last-child {
+  margin-bottom: 0;
 }
 
 .sliderContainer .description {
@@ -244,7 +303,11 @@ body {
   display: inline-flex;
   text-align: center;
   border-width: 0px;
+  border-radius: 4px;
   width: 40px;
+  height: 20px;
+  box-sizing: border-box;
+  background-color: #eee;
 }
 
 .sliderContainer .slider {
@@ -276,6 +339,7 @@ body {
   width: 100%;
   height: 100px;
   box-sizing: border-box;
+  border-radius: 4px;
 }
 
 .panel.--expressionMode .codeContainer {
