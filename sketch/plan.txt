@@ -4,12 +4,12 @@ TODOS:
 	2. Theming
 	3. Closeable panel
 	4. Settings
-2) Touch support
+2) Touch support V
 3) Service worker V
-4) Library of fractals
+4) Library of fractals - postponed X
 5) History api V
-6) Additional info
-7) Save settings
+6) Additional info - postponed X
+7) Save settings - don't know what that means, I don't have any settings X
 8) Scale to Slider piping V
 9) Change scale units V
 10) Web app manifest V
