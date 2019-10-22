@@ -211,7 +211,7 @@ let panelOpen = false;
 const togglePanelButton = $('.togglePanelButton');
 const panel = $('.panel');
 
-togglePanelButton.on('click', function(event) {
+function togglePanelOpen() {
   panelOpen = !panelOpen;
 
   if (panelOpen) {
@@ -221,7 +221,9 @@ togglePanelButton.on('click', function(event) {
     togglePanelButton.text('>');
     panel.css('left', '-250px');
   }
-});
+}
+
+togglePanelButton.on('click', togglePanelOpen);
 
 /*
 displayMessage({

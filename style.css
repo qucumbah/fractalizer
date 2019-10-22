@@ -38,34 +38,34 @@ button:hover {
   background-color: rgba(0, 0, 0, 0.7);
 }
 
-.modal .modalWrapper {
+.modalWrapper {
   position: absolute;
   padding: 15px;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  background-color: white;
-  border-radius: 10px;
+  background-color: #001224;
+  border-radius: 4px;
 }
 
-.modal .modalTitle {
+.modalTitle {
   margin: 0;
-}
-
-.modal .modalContent {
-  margin: 15px 0;
 }
 
 .modal .buttons {
   display: flex;
-  justify-content: flex-end;
+  justify-content: space-between;
+  margin-top: 10px;
 }
-.modal .buttons .button {
-  cursor: pointer;
-  padding: 5px;
-  border-radius: 10px;
-  border: 1px solid black;
-  margin-left: 5px;
+
+.modalContent {
+  margin: 15px 0;
+}
+.modalContent input {
+  border-radius: 4px;
+  height: 20px;
+  border: none;
+  margin: 3px 0 10px;
 }
 
 /* Messages */
@@ -351,4 +351,30 @@ button:hover {
 
 .errorOutput {
   color: red;
+}
+
+.fastRunButton {
+  transition: 0.2s;
+  z-index: 1;
+  position: absolute;
+  bottom: 0;
+  width: 180px;
+  height: 50px;
+  margin: 35px;
+  box-sizing: border-box;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: #001224;
+  border-radius: 8px;
+  font-size: 30px;
+  font-weight: 900;
+  color: rgba(150, 255, 255, 1);
+  text-shadow: 0 0 15px rgba(0, 255, 255, 0.3);
+  opacity: 0;
+  user-select: none;
+}
+.fastRunButton.--needsRerun {
+  opacity: 1;
+  cursor: pointer;
 }

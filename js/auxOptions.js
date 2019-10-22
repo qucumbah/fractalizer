@@ -86,10 +86,11 @@ let fakeScale = auxOptions.scale;
 let initialScale = auxOptions.scale;
 
 function setFakeScale(amount, mouseOffset) {
-  console.log(amount);
   if (amount <= 1) {
     return;
   }
+
+  setNeedsRerun(true);
 
   if (!initialScale) {
     initialScale = auxOptions.scale;
@@ -251,7 +252,10 @@ function setMode(newMode) {
   panel.attr('class', className)
 }
 
-$('.codeRunButton').click(function() {
+const codeRunButton = $('.codeRunButton');
+const expressionRunButton = $('.expressionRunButton');
+
+codeRunButton.click(function() {
   const body = $('.code').get(0).value;
 
   auxOptions.update({
@@ -263,9 +267,10 @@ $('.codeRunButton').click(function() {
   });
 
   initialScale = 0;
+  setNeedsRerun(false);
 });
 
-$('.expressionRunButton').click(function() {
+expressionRunButton.click(function() {
   const currentExpression = $('.expression').get(0).value;
 
   try {
@@ -279,6 +284,7 @@ $('.expressionRunButton').click(function() {
     });
 
     initialScale = 0;
+    setNeedsRerun(false);
   } catch (error) {
     outputError(error);
   }
@@ -290,13 +296,36 @@ $('.expressionCopyCodeButton').click(function() {
   navigator.clipboard.writeText(currentFunctionBody);
 });
 
+const fastRunButton = $('.fastRunButton');
+fastRunButton.click(fastRun);
+
+//This is set to true after any scale change; changes back to false after
+//codeRunButton or expressionRunButton get pressed
+let scaleChanged = false;
+function setNeedsRerun(value) {
+  scaleChanged = value;
+  if (!value) {
+    fastRunButton.removeClass('--needsRerun');
+  } else {
+    fastRunButton.addClass('--needsRerun');
+  }
+}
+
+function fastRun() {
+  if (!scaleChanged) {
+    return;
+  }
+
+  if (auxOptions.mode === 'expression') {
+    expressionRunButton.trigger('click');
+  } else {
+    codeRunButton.trigger('click');
+  }
+}
+
 auxOptions.on('change', event => {
-  // console.log('should be', event.expressionBody);
   expression.val(event.expressionBody);
   code.text(event.codeBody);
-  // scaleSlider.val(event.scale);
-  // saturationRangeSlider.val(event.saturationRange);
-  // valueRangeSlider.val(event.valueRange);
 });
 
 expression.text(DEFAULT_EXPRESSION_BODY);
