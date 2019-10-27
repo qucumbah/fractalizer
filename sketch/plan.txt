@@ -21,7 +21,3 @@ TODOS:
 16) Change scale units in sliders V
 17) Smooth animations - postponed X
 18) Rewrite content position V
-
-Fractalibrary
-c^{-1;-1} - whirlwind
-c^{0;-1} - infinite circle

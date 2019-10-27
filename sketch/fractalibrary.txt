@@ -1,0 +1,80 @@
+Expressions:
+c^{-1;-1} - whirlwind
+c^{0;-1} - infinite circle
+
+Fractals:
+Mandelbrot set:
+vec2 fun(vec2 c) {
+  vec2 z = vec2(0, 0);
+  int cnt = 0;
+  for (int i = 0; i < 255; i++) {
+    z = mul(z, z);
+    z = add(z, c);
+	if (z.x*z.x + z.y*z.y >= 4.0) {
+      break;
+    }
+    cnt++;
+  }
+
+  return vec2(cnt, -100);
+}
+
+Sierpinski triangle
+bool isInside(vec2 point, vec2 start) {
+	vec2 p = (point - start) / 0.5;
+
+	if (p.x < 0.0 || p.x > 1.0 || p.y < 0.0 || p.y > 1.0) {
+		return false;
+	}
+
+	if (p.x <= 0.5 && p.y < 2.0*p.x) {
+		return true;
+	}
+	if (p.x >= 0.5 && p.y < 1.0 - 2.0*(p.x - 0.5)) {
+		return true;
+	}
+
+	return false;
+}
+vec2 getTriangle(vec2 p) {
+	vec2 leftTriangleStart = vec2(0, 0);
+	if ( isInside(p, leftTriangleStart) ) {
+		return leftTriangleStart;
+	}
+
+	vec2 topTriangleStart = vec2(0.25, 0.5);
+	if ( isInside(p, topTriangleStart) ) {
+		return topTriangleStart;
+	}
+
+	vec2 rightTriangleStart = vec2(0.5, 0);
+	if ( isInside(p, rightTriangleStart) ) {
+		return rightTriangleStart;
+	}
+
+	return vec2(-1, -1);
+}
+vec2 fun(vec2 c) {
+	vec2 last = vec2(0, 0);
+	float size = 1.0;
+	bool inside = true;
+	for (int i = 0; i < 8; i++) {
+		vec2 p = (c - last) / size;
+
+		vec2 triangle = getTriangle(p);
+		if (triangle.x < 0.0) {
+			//Not inside any triangle
+			inside = false;
+			break;
+		}
+
+		last = last + triangle * size;
+		size = size / 2.0;
+	}
+
+	if (inside) {
+		return vec2(0, 0);
+	} else {
+		return vec2(1, 1);
+	}
+}
