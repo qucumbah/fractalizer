@@ -78,3 +78,40 @@ vec2 fun(vec2 c) {
 		return vec2(1, 1);
 	}
 }
+
+Random fractal:
+const int seed = 0;
+float rand(vec2 co) {
+	float a = 12.9898;
+    float b = 78.233;
+    float c = 43758.5453;
+    float dt = dot(co.xy, vec2(a, b));
+    float sn = mod(dt, 3.14);
+    return fract(sin(sn) * c);
+}
+vec2 julia(vec2 c, vec2 z) {
+  int cnt = 0;
+  for (int i = 0; i < 255; i++) {
+    z = mul(z, z);
+    z = add(z, c);
+	if (z.x*z.x + z.y*z.y >= 4.0) {
+      break;
+    }
+    cnt++;
+  }
+
+  return vec2(cnt, -100);
+}
+vec2 fun(vec2 i) {
+	float a = mod( float(seed / 0x0001), 16.0 );
+	float b = mod( float(seed / 0x0010), 16.0 );
+	float c = mod( float(seed / 0x0100), 16.0 );
+	float d = mod( float(seed / 0x1000), 16.0 );
+	
+	float x = i.x;
+	float y = i.y;
+	
+	float r = rand( vec2(a+b, c+d) ) * 2.0 * PI;
+
+	return julia(i, polarToCartesian(0.7885, r));
+}

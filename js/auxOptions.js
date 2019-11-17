@@ -258,7 +258,8 @@ const expressionRunButton = $('.expressionRunButton');
 codeRunButton.click(function() {
   const body = $('.code').get(0).value;
 
-  auxOptions.update({
+  try {
+	auxOptions.update({
     body,
     codeBody: body,
     contentScaleFactor: 1,
@@ -268,6 +269,9 @@ codeRunButton.click(function() {
 
   initialScale = 0;
   setNeedsRerun(false);
+  } catch (error) {
+    outputError(error);
+  }
 });
 
 expressionRunButton.click(function() {
